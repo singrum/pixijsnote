@@ -1,8 +1,5 @@
+
 import PIXI from "../../node_modules/pixi.js/dist/pixi.js"
-
-
-
-
 
 class Circle {
     constructor(centerX, centerY, isWhite) {
