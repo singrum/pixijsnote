@@ -55,12 +55,13 @@ class App {
             if ('ontouchstart' in window) {
                 window.addEventListener("touchmove", moveEvent, false);
                 this.currPointers = e.targetTouches;
-                console.log(e.targetTouches)
+                
 
             }
             else {
                 window.addEventListener("mousemove", moveEvent, false);
                 this.currPointers = [e];
+                
 
             }
         }
@@ -140,6 +141,7 @@ class App {
                 counter = 0;
 
                 for (let pointer of this.currPointers) {
+                    console.log(this.currPointers)
                     const pixelData = this.app.renderer.extract.pixels();
                     const index = (pointer.clientY * this.app.view.width + pointer.clientX) * 4;
                     // 픽셀 데이터에서 해당 좌표의 채널(R, G, B, A) 값을 추출
