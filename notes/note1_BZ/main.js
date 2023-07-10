@@ -45,7 +45,7 @@ class App {
         document.body.appendChild(app.view);
         this.setInteraction();
         this.setTicker();
-        console.log(app.renderer)
+        
 
     }
     setInteraction() {
@@ -141,7 +141,7 @@ class App {
                 counter = 0;
 
                 for (let pointer of this.currPointers) {
-                    console.log(this.currPointers)
+                    console.log(this.currPointers[0].clientX, this.currPointers[0].clientY,this.currPointers[1].clientX,this.currPointers[1].clientY)
                     const pixelData = this.app.renderer.extract.pixels();
                     const index = (pointer.clientY * this.app.view.width + pointer.clientX) * 4;
                     // 픽셀 데이터에서 해당 좌표의 채널(R, G, B, A) 값을 추출
