@@ -80,7 +80,7 @@ class App {
                 const temp = [];
                 for(let p of this.currPointers){
                     let include = false;
-                    for(let c of this.changedTouches){
+                    for(let c of e.changedTouches){
                         if(p === c){
                             include = true;
                         }
