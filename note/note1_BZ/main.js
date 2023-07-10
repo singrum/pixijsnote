@@ -2,46 +2,7 @@ import PIXI from "../../node_modules/pixi.js/dist/pixi.js"
 
 
 
-const rectToCircleShader = PIXI.Program.from(
-    `
-  attribute vec2 vPosition;
-  attribute vec2 vUv;
-  
-  uniform mat3 projectionMatrix;
-  
-  varying vec2 uv;
 
-  void main() {
-    gl_Position = vec4((projectionMatrix * vec3(vPosition, 1.0)).xy, 0.0, 1.0);
-    uv = vUv;
-  }
-`,
-    `
-varying vec2 uv;
-  
-uniform int u_isWhite;
-
-void makeCircle(){
-  if(distance(uv, vec2(0.5)) > 0.5){
-      discard;
-  }
-}
-
-vec3 color(){
-  if(u_isWhite == 1){
-      return vec3(1.0,1.0,1.0);
-  }
-  return vec3(0.0,0.0,0.0);
-  
-}
-
-void main() {
-  
-  // makeCircle();
-
-  gl_FragColor = vec4(1.0,1.0,0.0, 1.0);
-}
-`);
 
 class Circle {
     constructor(centerX, centerY, isWhite) {
@@ -55,51 +16,18 @@ class Circle {
         this.radius += x;
     }
     getObj() {
-        // Geometry 객체를 생성합니다.
-        const geometry = new PIXI.Geometry()
-            .addAttribute('vPosition',[
-                -10, -10, 
-                10, -10, 
-                -10, 10, 
-                10, 10],2)
-            .addAttribute('vUv', [
-                0, 0,
-                1, 0,
-                0, 1,
-                1, 1,
-            ],2)
-            .addIndex(new Uint16Array([
-                0, 1, 2, // 삼각형 1의 정점 인덱스
-                1, 2, 3  // 삼각형 2의 정점 인덱스
-            ]))
 
 
 
+        const obj = new PIXI.Graphics()
+        obj.lineStyle(0);
+        obj.beginFill(this.isWhite ? 0xffffff : 0x000000, 1);
 
-        // Mesh 객체를 생성합니다.
-        const mesh = new PIXI.Mesh(
-            geometry,
-            new PIXI.MeshMaterial(PIXI.Texture.WHITE, {
-                program: rectToCircleShader,
-                uniforms: { u_isWhite: this.isWhite }
-            })
-        );
-        return mesh
+        obj.drawCircle(0, 0, 100);
+        obj.x = this.centerX
+        obj.y = this.centerY
 
-
-        // const obj = new PIXI.Graphics()
-        // obj.lineStyle(0);
-        // obj.beginFill(this.isWhite ? 0xffffff : 0x000000, 1);
-
-        // obj.drawRect(-1,-1,2,2);
-
-        // const RectToCircleFilter = new RectToCircle()
-        // obj.filters = [RectToCircleFilter];
-        // if(this.isWhite){
-        //     RectToCircleFilter.uniforms.isWhite = 1;
-        // }
-
-        // return obj;
+        return obj;
     }
 }
 
@@ -208,8 +136,7 @@ class App {
                     const circle = new Circle(pointer.clientX, pointer.clientY, red === 0 ? 1 : 0);
                     this.currCircles.push(circle);
                     this.app.stage.addChild(circle.obj)
-                    circle.obj.position.set(circle.centerX,circle.centerY)
-                    circle.obj.scale.set(circle.radius)
+                    
 
                 }
 
@@ -220,8 +147,8 @@ class App {
         const growCircle = delta => {
             for (let circle of this.currCircles) {
                 circle.addRad(delta * 2);
-                circle.obj.scale.x = circle.radius
-                circle.obj.scale.y = circle.radius
+                circle.obj.scale.x = circle.radius/100
+                circle.obj.scale.y = circle.radius/100
 
             }
         }
