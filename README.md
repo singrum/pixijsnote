@@ -1,2 +1,2 @@
 # pixijsnote  
-BZ Pattern : https://singrum.github.io/pixijsnotenotes/note1_BZ/BZ
+BZ Pattern : https://singrum.github.io/pixijsnote/notes/note1_BZ/BZ
