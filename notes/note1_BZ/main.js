@@ -146,7 +146,8 @@ class App {
                     const index = (pointer.clientY * this.app.view.width + pointer.clientX) * 4;
                     // 픽셀 데이터에서 해당 좌표의 채널(R, G, B, A) 값을 추출
                     const red = pixelData[index];
-                    console.log(pixelData)
+                    console.log(index,pixelData.length)
+                    
                     
                     const circle = new Circle(pointer.clientX, pointer.clientY, red === 0 ? 1 : 0);
                     this.currCircles.push(circle);
