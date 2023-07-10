@@ -151,10 +151,10 @@ class App {
                     this.currCircles.push(circle);
                     this.app.stage.addChild(circle.obj)
                     
-
+                    discardCircle();
                 }
 
-                discardCircle();
+                
             }
         }
 
