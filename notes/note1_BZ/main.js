@@ -77,9 +77,19 @@ class App {
         const upEvent = e => {
             if ('ontouchstart' in window) {
                 window.removeEventListener("touchmove", moveEvent, false)
-                for (let touch of e.changedTouches) {
-                    this.currPointers = this.currPointers.filter(e => e !== touch);
+                const temp = [];
+                for(let p of this.currPointers){
+                    let include = false;
+                    for(let c of this.changedTouches){
+                        if(p === c){
+                            include = true;
+                        }
+                    }
+                    if(!include){
+                        temp.push(p)
+                    }
                 }
+                this.currPointers = temp;
             }
             else {
                 window.removeEventListener("mousemove", moveEvent, false)
