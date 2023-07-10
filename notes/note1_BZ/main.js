@@ -32,7 +32,7 @@ class App {
 
     constructor() {
         PIXI.settings.RESOLUTION = window.devicePixelRatio
-        PIXI.GRAPHICS_CURVES.adaptive = false
+    
         const app = new PIXI.Application({
             width: window.innerWidth, height: window.innerHeight,
             backgroundColor: 0x000000, // 배경 색상을 불투명한 검은색으로 설정합니다.
@@ -146,7 +146,7 @@ class App {
                     const index = (pointer.clientY * this.app.view.width + pointer.clientX) * 4;
                     // 픽셀 데이터에서 해당 좌표의 채널(R, G, B, A) 값을 추출
                     const red = pixelData[index];
-                    console.log(red)
+                    console.log(pixelData)
                     
                     const circle = new Circle(pointer.clientX, pointer.clientY, red === 0 ? 1 : 0);
                     this.currCircles.push(circle);
