@@ -6,11 +6,11 @@ import PIXI from "../../node_modules/pixi.js/dist/pixi.js"
 
 
 class Circle {
-	constructor(centerX, centerY, BWflag){
+	constructor(centerX, centerY, isWhite){
 		this.centerX = centerX;
 		this.centerY = centerY;
 		this.radius = 0;
-		this.BWflag = BWflag;
+		this.isWhite = isWhite;
         this.obj = this.getObj();
 	}
 	addRad(x){
@@ -19,7 +19,7 @@ class Circle {
     getObj(){
         const obj = new PIXI.Graphics()
         obj.lineStyle(0); // draw a circle, set the lineStyle to zero so the circle doesn't have an outline
-        obj.beginFill(0xffffff, 1);
+        obj.beginFill(this.isWhite ? 0xffffff : 0x000000, 1);
         obj.drawCircle(0,0,10);
         obj.endFill();
         return obj;
@@ -29,17 +29,15 @@ class Circle {
 class App{
 
     constructor(){
-        const app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight });
+        const app = new PIXI.Application({ 
+            width: window.innerWidth, height: window.innerHeight,
+            backgroundColor: 0x000000, // 배경 색상을 불투명한 검은색으로 설정합니다.
+            transparent: false, 
+        });
         this.app = app;
-        const canvas = document.createElement('canvas');
-        canvas.width = app.renderer.width;
-        canvas.height = app.renderer.height;
-        this.canvas = canvas
-        const ctx2d = canvas.getContext("2d", {willReadFrequently : true})
-        this.ctx2d = ctx2d;
-        document.body.appendChild(this.canvas);
         
-        // document.body.appendChild(app.view);
+        
+        document.body.appendChild(app.view);
         this.setInteraction();
         this.setTicker();
         console.log(app.renderer)
@@ -50,12 +48,12 @@ class App{
         const downEvent = e => {
             
 			if ('ontouchstart' in window) {
-                this.canvas.addEventListener("touchmove", moveEvent,false);
+                window.addEventListener("touchmove", moveEvent,false);
                 this.currPointers = e.targetTouches;
                 
             }
             else {
-                this.canvas.addEventListener("mousemove", moveEvent,false);
+                window.addEventListener("mousemove", moveEvent,false);
                 this.currPointers = [e];
                 
             }
@@ -72,13 +70,13 @@ class App{
 		}
 		const upEvent = e => {
 			if ('ontouchstart' in window) {
-                this.canvas.removeEventListener("touchmove", moveEvent,false)
+                window.removeEventListener("touchmove", moveEvent,false)
                 for (let touch of e.changedTouches) {
 					this.currPointers = this.currPointers.filter(e => e !== touch);
 				}
             }
             else {
-                this.canvas.removeEventListener("mousemove", moveEvent,false)
+                window.removeEventListener("mousemove", moveEvent,false)
                 this.currPointers = []
             }
 
@@ -86,17 +84,17 @@ class App{
 
 
 		if ('ontouchstart' in window) {
-            this.canvas.addEventListener('touchstart', downEvent);
-            this.canvas.addEventListener('touchend', upEvent);
+            window.addEventListener('touchstart', downEvent);
+            window.addEventListener('touchend', upEvent);
         }
 		else {
             
-            this.canvas.addEventListener('mousedown', downEvent);
-            this.canvas.addEventListener('mouseup', upEvent);
+            window.addEventListener('mousedown', downEvent);
+            window.addEventListener('mouseup', upEvent);
         }
 
     }
-    setTicker(){
+    async setTicker(){
         let counter = 0;
         const period = 10;
         this.currCircles = [];
@@ -106,9 +104,12 @@ class App{
                 counter = 0;
 
                 for(let pointer of this.currPointers){
-                    const pxData = this.ctx2d.getImageData(pointer.clientX, pointer.clientY, 1, 1).data
-                    // console.log(pxData)
-                    const circle = new Circle(pointer.clientX, pointer.clientY, 1);
+                    const pixelData = this.app.renderer.extract.pixels ();
+                    const index = (pointer.clientY * this.app.view.width + pointer.clientX) * 4;
+                    // 픽셀 데이터에서 해당 좌표의 채널(R, G, B, A) 값을 추출
+                    const red = pixelData[index];
+                    console.log(red)
+                    const circle = new Circle(pointer.clientX, pointer.clientY, red === 0? true : false);
                     this.currCircles.push(circle);
                     this.app.stage.addChild(circle.obj)
                     circle.obj.x = circle.centerX;
@@ -120,7 +121,7 @@ class App{
         }
         const growCircle = delta => {
             for(let circle of this.currCircles){
-                circle.addRad(delta * 0.1);
+                circle.addRad(delta * 0.3);
                 circle.obj.scale.x = circle.radius
                 circle.obj.scale.y = circle.radius
             }
@@ -128,8 +129,7 @@ class App{
 
 
         this.app.ticker.add(delta=>{
-            this.app.renderer.render(this.app, this.canvas);
-            
+            this.app.renderer.render(this.app.stage)
             makeCircle(delta);
             growCircle(delta);
             
