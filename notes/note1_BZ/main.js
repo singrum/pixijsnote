@@ -55,6 +55,7 @@ class App {
             if ('ontouchstart' in window) {
                 window.addEventListener("touchmove", moveEvent, false);
                 this.currPointers = e.targetTouches;
+                console.log(e.targetTouches)
 
             }
             else {
