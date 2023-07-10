@@ -5,14 +5,44 @@ import PIXI from "../../node_modules/pixi.js/dist/pixi.js"
 
 
 
+class Circle {
+	constructor(centerX, centerY, BWflag){
+		this.centerX = centerX;
+		this.centerY = centerY;
+		this.radius = 0;
+		this.BWflag = BWflag;
+        this.obj = this.getObj();
+	}
+	addRad(x){
+		this.radius += x;
+	}
+    getObj(){
+        const obj = new PIXI.Graphics()
+        obj.lineStyle(0); // draw a circle, set the lineStyle to zero so the circle doesn't have an outline
+        obj.beginFill(0xffffff, 1);
+        obj.drawCircle(0,0,10);
+        obj.endFill();
+        return obj;
+    }
+}
 
 class App{
+
     constructor(){
         const app = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight });
         this.app = app;
-        document.body.appendChild(app.view);
+        const canvas = document.createElement('canvas');
+        canvas.width = app.renderer.width;
+        canvas.height = app.renderer.height;
+        this.canvas = canvas
+        const ctx2d = canvas.getContext("2d", {willReadFrequently : true})
+        this.ctx2d = ctx2d;
+        document.body.appendChild(this.canvas);
+        
+        // document.body.appendChild(app.view);
         this.setInteraction();
         this.setTicker();
+        console.log(app.renderer)
 
     }
     setInteraction(){
@@ -20,12 +50,12 @@ class App{
         const downEvent = e => {
             
 			if ('ontouchstart' in window) {
-                this.app.view.addEventListener("touchmove", moveEvent,false);
+                this.canvas.addEventListener("touchmove", moveEvent,false);
                 this.currPointers = e.targetTouches;
                 
             }
             else {
-                this.app.view.addEventListener("mousemove", moveEvent,false);
+                this.canvas.addEventListener("mousemove", moveEvent,false);
                 this.currPointers = [e];
                 
             }
@@ -42,13 +72,13 @@ class App{
 		}
 		const upEvent = e => {
 			if ('ontouchstart' in window) {
-                this.app.view.removeEventListener("touchmove", moveEvent,false)
+                this.canvas.removeEventListener("touchmove", moveEvent,false)
                 for (let touch of e.changedTouches) {
 					this.currPointers = this.currPointers.filter(e => e !== touch);
 				}
             }
             else {
-                this.app.view.removeEventListener("mousemove", moveEvent,false)
+                this.canvas.removeEventListener("mousemove", moveEvent,false)
                 this.currPointers = []
             }
 
@@ -56,40 +86,52 @@ class App{
 
 
 		if ('ontouchstart' in window) {
-            this.app.view.addEventListener('touchstart', downEvent);
-            this.app.view.addEventListener('touchend', upEvent);
+            this.canvas.addEventListener('touchstart', downEvent);
+            this.canvas.addEventListener('touchend', upEvent);
         }
 		else {
             
-            this.app.view.addEventListener('mousedown', downEvent);
-            this.app.view.addEventListener('mouseup', upEvent);
+            this.canvas.addEventListener('mousedown', downEvent);
+            this.canvas.addEventListener('mouseup', upEvent);
         }
 
     }
     setTicker(){
         let counter = 0;
-        const period = 0.4;
+        const period = 10;
+        this.currCircles = [];
         const makeCircle = delta => {
             counter += delta
             if(counter > period){
                 counter = 0;
 
-                console.log(this.currPointers)
+                for(let pointer of this.currPointers){
+                    const pxData = this.ctx2d.getImageData(pointer.clientX, pointer.clientY, 1, 1).data
+                    // console.log(pxData)
+                    const circle = new Circle(pointer.clientX, pointer.clientY, 1);
+                    this.currCircles.push(circle);
+                    this.app.stage.addChild(circle.obj)
+                    circle.obj.x = circle.centerX;
+                    circle.obj.y = circle.centerY;
+                    
+                }
 
             }
         }
         const growCircle = delta => {
-
-        }
-        const drawCircle = delta => {
-
+            for(let circle of this.currCircles){
+                circle.addRad(delta * 0.1);
+                circle.obj.scale.x = circle.radius
+                circle.obj.scale.y = circle.radius
+            }
         }
 
 
         this.app.ticker.add(delta=>{
+            this.app.renderer.render(this.app, this.canvas);
+            
             makeCircle(delta);
             growCircle(delta);
-            drawCircle(delta);
             
         })
 
