@@ -143,10 +143,10 @@ class App {
                 for (let pointer of this.currPointers) {
                     
                     const pixelData = this.app.renderer.extract.pixels();
-                    const index = (pointer.clientY * this.app.view.width + pointer.clientX) * 4;
+                    const index = Math.floor((pointer.clientY * this.app.view.width + pointer.clientX) * 4);
                     // 픽셀 데이터에서 해당 좌표의 채널(R, G, B, A) 값을 추출
                     const red = pixelData[index];
-                    console.log(index,pixelData.length)
+                    
                     
                     
                     const circle = new Circle(pointer.clientX, pointer.clientY, red === 0 ? 1 : 0);
