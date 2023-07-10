@@ -40,6 +40,7 @@ class App {
             width: window.innerWidth, height: window.innerHeight,
             backgroundColor: 0x000000, // 배경 색상을 불투명한 검은색으로 설정합니다.
             transparent: false,
+            renderer : PIXI.WebGLRenderer
         });
         this.app = app;
 
@@ -105,6 +106,9 @@ class App {
         let counter = 0;
         const period = 10;
         this.currCircles = [];
+
+
+        
         const discardCircle = () => {
             if (this.currCircles.length === 0) { return; }
 
@@ -154,11 +158,18 @@ class App {
         }
 
 
+        // const filter = new PIXI.Filter(myShaderVert, myShaderFrag, { myUniform: 0.5 });
+
+        const applyFilter = () => {
+            
+
+        }
+
         this.app.ticker.add(delta => {
             this.app.renderer.render(this.app.stage)
             makeCircle(delta);
             growCircle(delta);
-
+            applyFilter();
         })
 
 
