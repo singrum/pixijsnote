@@ -145,6 +145,7 @@ class App {
                     const pixelData = this.app.renderer.extract.pixels();
                     const index = Math.floor((pointer.clientY * this.app.view.width + pointer.clientX) * 4);
                     // 픽셀 데이터에서 해당 좌표의 채널(R, G, B, A) 값을 추출
+                    console.log(pointer.clientX, pointer.clientY)
                     const red = pixelData[index];
                     
                     
