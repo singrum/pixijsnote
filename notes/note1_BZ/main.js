@@ -158,18 +158,6 @@ class App {
                     circle.obj.zIndex = circle.color
 
 
-
-                    // if(this.currCircles.length === 0){
-                    //     this.currCircles.push(circle)
-                    // }
-                    // for(let i = this.currCircles.length - 1; i >=0; i--){
-                    //     if(this.currCircles[i].color < circle.color){
-                    //         this.currCircles.splice(i + 1, 0, circle);
-                    //         break;
-                    //     }
-                    // }
-                    
-
                     
                     this.app.stage.addChild(circle.obj)
                     
