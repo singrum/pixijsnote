@@ -1,6 +1,6 @@
 
 import PIXI from "../../node_modules/pixi.js/dist/pixi.js"
-// import {BloomFilter} from '../../node_modules/@pixi/filter-bloom/dist/filter-bloom.js';
+
 
 class Circle {
     constructor(centerX, centerY, color) {
@@ -36,7 +36,7 @@ class App {
     
         const app = new PIXI.Application({
             width: window.innerWidth, height: window.innerHeight,
-            backgroundColor: 0, // 배경 색상을 불투명한 검은색으로 설정합니다.
+            backgroundColor: 1, // 배경 색상을 불투명한 검은색으로 설정합니다.
             transparent: false,
             renderer : PIXI.WebGLRenderer
         });
@@ -45,6 +45,7 @@ class App {
 
         document.body.appendChild(app.view);
         this.setInteraction();
+        this.setBackground();
         this.setTicker();
         
 
@@ -112,12 +113,28 @@ class App {
         }
 
     }
-    async setTicker() {
+
+    setBackground(){
+        const background = new PIXI.Graphics()
+        
+        background.lineStyle(0);
+        background.beginFill(1);
+
+        background.drawRect(0, 0, window.innerWidth, window.innerHeight);
+        
+        this.app.stage.addChild(background);
+        
+    }
+    setTicker() {
+        let uTime = 0;
         let counter = 0;
         const period = 10;
         this.currCircles = [];
         const circleContainer = new PIXI.Container()
         this.app.stage.addChild(circleContainer)
+
+
+
 
         // V Shader
         const vertexShader = /*glsl*/`#version 300 es
@@ -148,20 +165,57 @@ class App {
 
         uniform sampler2D uSampler;
         
-        uniform float uCustomUniform;
+        uniform float uTime;
+        float hue2rgb(float h, float p, float q)
+        {
+            if (h < 0.0) h += 1.0;
+            if (h > 1.0) h -= 1.0;
+        
+            if (h < 1.0 / 6.0)
+                return p + (q - p) * 6.0 * h;
+            else if (h < 1.0 / 2.0)
+                return q;
+            else if (h < 2.0 / 3.0)
+                return p + (q - p) * (2.0 / 3.0 - h) * 6.0;
+            else
+                return p;
+        }
+        vec3 hsl2rgb(vec3 hsl)
+        {
+            vec3 rgb;
+            float h = hsl.x;
+            float s = hsl.y;
+            float l = hsl.z;
+        
+            float q = l < 0.5 ? l * (1.0 + s) : l + s - l * s;
+            float p = 2.0 * l - q;
+        
+            rgb.r = hue2rgb(h + 1.0 / 3.0, p, q);
+            rgb.g = hue2rgb(h, p, q);
+            rgb.b = hue2rgb(h - 1.0 / 3.0, p, q);
+        
+            return rgb;
+        }
+        
 
         vec3 edgeDetect(){
             ivec2 pix = ivec2(gl_FragCoord.xy);
             // vec4 s00 = texelFetchOffset(uSampler, pix, 0, ivec2(-1,1));
-            vec4 s10 = texelFetchOffset(uSampler, pix, 0, ivec2(-1,0));
+            vec4 s10 = texelFetchOffset(uSampler, pix, 0, ivec2(-2,0));
             // vec4 s20 = texelFetchOffset(uSampler, pix, 0, ivec2(-1,-1));
-            vec4 s01 = texelFetchOffset(uSampler, pix, 0, ivec2(0,1));
-            vec4 s21 = texelFetchOffset(uSampler, pix, 0, ivec2(0,-1));
+            vec4 s01 = texelFetchOffset(uSampler, pix, 0, ivec2(0,2));
+            vec4 s21 = texelFetchOffset(uSampler, pix, 0, ivec2(0,-2));
             // vec4 s02 = texelFetchOffset(uSampler, pix, 0, ivec2(1,1));
-            vec4 s12 = texelFetchOffset(uSampler, pix, 0, ivec2(1,0));
+            vec4 s12 = texelFetchOffset(uSampler, pix, 0, ivec2(2,0));
             // vec4 s22 = texelFetchOffset(uSampler, pix, 0, ivec2(1,-1));
+            if(all(equal(s10, vec4(0.0)))||all(equal(s01, vec4(0.0)))||all(equal(s21, vec4(0.0)))||all(equal(s12, vec4(0.0)))){
+                return vec3(0.0,0.0,0.0);
+            }
             if(any(notEqual(s10, s12)) || any(notEqual(s01, s21))){
-                return vec3(1.0,1.0,1.0);
+                vec4 s = texelFetchOffset(uSampler, pix, 0, ivec2(0,0));
+                vec3 hsl = vec3(mod(s.b * 30.0 ,1.0), 0.5, 0.5);
+                return hsl2rgb(hsl);
+                
             }
             else{
                 return vec3(0.0,0.0,0.0);
@@ -169,14 +223,13 @@ class App {
         }
         void main(void) {
             vec2 vUv = vTextureCoord;
-            // vec4 color = texture2D(uSampler, vUv);
 
 
             fragColor = vec4(edgeDetect(), 1.0);
         }
         `;
-        const filter = new PIXI.Filter(vertexShader, fragmentShader, {uCostomUniform : 1});
-        filter.filterArea = this.app.renderer.screen
+        const filter = new PIXI.Filter(vertexShader, fragmentShader, {uTime : 1});
+        
 
         
         const discardCircle = () => {
@@ -234,20 +287,23 @@ class App {
         const applyFilter = () => {
             
             
-            this.app.renderer.render(circleContainer, {renderTexture : renderTarget});
+            this.app.renderer.render(this.app.stage, {renderTexture : renderTarget});
             
             const sprite = PIXI.Sprite.from(renderTarget)
             
-            sprite.filters = [filter, new PIXI.BlurFilter()];
+            sprite.filters = [filter];
 
-            // sprite.anchor.y = 1;     /* 0 = top, 0.5 = center, 1 = bottom */
-            // sprite.scale.y *= -1; 
+            sprite.anchor.y = 1; 
+            sprite.scale.y *= -1; 
             this.app.stage.addChild(sprite);
         }
 
         this.app.ticker.add(delta => {
-            this.app.stage.children.length = 1
+            this.app.stage.children.length = 2
             this.app.renderer.render(this.app.stage)
+            uTime += delta;
+            filter.uniforms.uTime = uTime;
+            console.log(this.app.stage)
             makeCircle(delta);
             growCircle(delta);
             discardCircle()
