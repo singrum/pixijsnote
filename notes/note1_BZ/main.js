@@ -1,5 +1,5 @@
 
-import PIXI from "../../node_modules/pixi.js/dist/pixi.js"
+// import PIXI from "../../node_modules/pixi.js/dist/pixi.js"
 
 
 class Circle {
@@ -200,21 +200,18 @@ class App {
 
         vec3 edgeDetect(){
             ivec2 pix = ivec2(gl_FragCoord.xy);
-            // vec4 s00 = texelFetchOffset(uSampler, pix, 0, ivec2(-1,1));
             vec4 s10 = texelFetchOffset(uSampler, pix, 0, ivec2(-2,0));
-            // vec4 s20 = texelFetchOffset(uSampler, pix, 0, ivec2(-1,-1));
             vec4 s01 = texelFetchOffset(uSampler, pix, 0, ivec2(0,2));
             vec4 s21 = texelFetchOffset(uSampler, pix, 0, ivec2(0,-2));
-            // vec4 s02 = texelFetchOffset(uSampler, pix, 0, ivec2(1,1));
             vec4 s12 = texelFetchOffset(uSampler, pix, 0, ivec2(2,0));
-            // vec4 s22 = texelFetchOffset(uSampler, pix, 0, ivec2(1,-1));
             if(all(equal(s10, vec4(0.0)))||all(equal(s01, vec4(0.0)))||all(equal(s21, vec4(0.0)))||all(equal(s12, vec4(0.0)))){
                 return vec3(0.0,0.0,0.0);
             }
             if(any(notEqual(s10, s12)) || any(notEqual(s01, s21))){
                 vec4 s = texelFetchOffset(uSampler, pix, 0, ivec2(0,0));
-                vec3 hsl = vec3(mod(s.b * 30.0 ,1.0), 0.5, 0.5);
+                vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 1.0, 0.7);
                 return hsl2rgb(hsl);
+                // return vec3(1.0,1.0,1.0);
                 
             }
             else{
@@ -292,6 +289,7 @@ class App {
             const sprite = PIXI.Sprite.from(renderTarget)
             
             sprite.filters = [filter];
+            
 
             sprite.anchor.y = 1; 
             sprite.scale.y *= -1; 
@@ -303,7 +301,7 @@ class App {
             this.app.renderer.render(this.app.stage)
             uTime += delta;
             filter.uniforms.uTime = uTime;
-            console.log(this.app.stage)
+            
             makeCircle(delta);
             growCircle(delta);
             discardCircle()
