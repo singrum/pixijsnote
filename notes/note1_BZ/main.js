@@ -115,22 +115,40 @@ class App {
         let counter = 0;
         const period = 10;
         this.currCircles = [];
-        
+        const circleContainer = new PIXI.Container()
+        this.app.stage.addChild(circleContainer)
+
+
+
+        // Fragment Shader
+        var fragmentShader = `
+        varying vec2 vTextureCoord;
+        uniform sampler2D uSampler;
+        uniform float uCustomUniform;
+
+        void main(void) {
+            vec2 vUv = vTextureCoord;
+            vec4 color = texture2D(uSampler, vUv);
+            gl_FragColor = vec4(color.xyz, 1.0);
+        }
+        `;
+        const filter = new PIXI.Filter(undefined, fragmentShader, {uCostomUniform : 1});
+        filter.filterArea = this.app.renderer.screen
 
         
         const discardCircle = () => {
             if (this.currCircles.length === 0) { return; }
-            let i = 0;
+            
             while(this.currCircles[0].radius > Math.hypot(this.app.view.width, this.app.view.height)){
                 const circle = this.currCircles.shift();
                 if(circle.color > this.app.renderer.background.color){
                     this.app.renderer.background.color = circle.color;
                 }
                 circle.obj.destroy()
-                this.app.stage.removeChild(circle)
+                circleContainer.removeChild(circle)
                 
                 
-                i++
+                
             }
 
 
@@ -159,11 +177,10 @@ class App {
 
 
                     
-                    this.app.stage.addChild(circle.obj)
+                    circleContainer.addChild(circle.obj)
                     
                     discardCircle()
-                    this.app.stage.sortChildren()
-                    // console.log(this.app.stage.children.map(e=>e.zindex))
+                    circleContainer.sortChildren()
 
                 }
 
@@ -181,14 +198,23 @@ class App {
         }
 
 
-        // const filter = new PIXI.Filter(myShaderVert, myShaderFrag, { myUniform: 0.5 });
-
+        const renderTarget = PIXI.RenderTexture.create({ width: this.app.renderer.width, height: this.app.renderer.height }); 
         const applyFilter = () => {
             
+            
+            this.app.renderer.render(circleContainer, {renderTarget});
+            
+            const sprite = new PIXI.Sprite(renderTarget)
+            
 
+            
+            sprite.filters = [filter];
+            console.log(renderTarget)
+            this.app.stage.addChild(sprite);
         }
 
         this.app.ticker.add(delta => {
+            this.app.stage.children.length = 1
             this.app.renderer.render(this.app.stage)
             makeCircle(delta);
             growCircle(delta);
