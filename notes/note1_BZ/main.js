@@ -2,11 +2,11 @@
 import PIXI from "../../node_modules/pixi.js/dist/pixi.js"
 
 class Circle {
-    constructor(centerX, centerY, isWhite) {
+    constructor(centerX, centerY, color) {
         this.centerX = centerX;
         this.centerY = centerY;
         this.radius = 0;
-        this.isWhite = isWhite;
+        this.color = color
         this.obj = this.getObj();
     }
     addRad(x) {
@@ -18,7 +18,7 @@ class Circle {
 
         const obj = new PIXI.Graphics()
         obj.lineStyle(0);
-        obj.beginFill(this.isWhite ? 0xffffff : 0x000000, 1);
+        obj.beginFill(this.color);
 
         obj.drawCircle(0, 0, 100);
         obj.x = this.centerX
@@ -35,7 +35,7 @@ class App {
     
         const app = new PIXI.Application({
             width: window.innerWidth, height: window.innerHeight,
-            backgroundColor: 0x000000, // 배경 색상을 불투명한 검은색으로 설정합니다.
+            backgroundColor: 0, // 배경 색상을 불투명한 검은색으로 설정합니다.
             transparent: false,
             renderer : PIXI.WebGLRenderer
         });
@@ -82,7 +82,7 @@ class App {
                 for(let p of this.currPointers){
                     let include = false;
                     for(let c of e.changedTouches){
-                        if(p === c){
+                        if(p.identifier === c.identifier){
                             include = true;
                         }
                     }
@@ -123,12 +123,7 @@ class App {
 
             if (this.currCircles[0].radius > Math.hypot(this.app.view.width, this.app.view.height)) {
                 const circle = this.currCircles.shift();
-                if (circle.isWhite) {
-                    this.app.renderer.background.color = 0xffffff;
-                }
-                else {
-                    this.app.renderer.background.color = 0x000000;
-                }
+                this.app.renderer.background.color = circle.color
                 circle.obj.destroy()
 
 
@@ -145,12 +140,14 @@ class App {
                     const pixelData = this.app.renderer.extract.pixels();
                     const index = ((Math.floor(pointer.clientY)) * this.app.view.width + Math.floor(pointer.clientX)) * 4;
                     // 픽셀 데이터에서 해당 좌표의 채널(R, G, B, A) 값을 추출
-                    console.log(pointer.clientX, pointer.clientY)
+                    
                     const red = pixelData[index];
+                    const green = pixelData[index + 1];
+                    const blue = pixelData[index + 2];
+                    const colorCode = (red << 16) + (green << 8) + blue
+                    console.log(colorCode)
                     
-                    
-                    
-                    const circle = new Circle(pointer.clientX, pointer.clientY, red === 0 ? 1 : 0);
+                    const circle = new Circle(pointer.clientX, pointer.clientY, colorCode + 100);
                     this.currCircles.push(circle);
                     this.app.stage.addChild(circle.obj)
                     
