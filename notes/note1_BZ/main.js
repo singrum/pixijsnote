@@ -1,5 +1,6 @@
 
 import PIXI from "../../node_modules/pixi.js/dist/pixi.js"
+// import {BloomFilter} from '../../node_modules/@pixi/filter-bloom/dist/filter-bloom.js';
 
 class Circle {
     constructor(centerX, centerY, color) {
@@ -151,19 +152,19 @@ class App {
 
         vec3 edgeDetect(){
             ivec2 pix = ivec2(gl_FragCoord.xy);
-            vec4 s00 = texelFetchOffset(uSampler, pix, 0, ivec2(-1,1));
+            // vec4 s00 = texelFetchOffset(uSampler, pix, 0, ivec2(-1,1));
             vec4 s10 = texelFetchOffset(uSampler, pix, 0, ivec2(-1,0));
-            vec4 s20 = texelFetchOffset(uSampler, pix, 0, ivec2(-1,-1));
+            // vec4 s20 = texelFetchOffset(uSampler, pix, 0, ivec2(-1,-1));
             vec4 s01 = texelFetchOffset(uSampler, pix, 0, ivec2(0,1));
             vec4 s21 = texelFetchOffset(uSampler, pix, 0, ivec2(0,-1));
-            vec4 s02 = texelFetchOffset(uSampler, pix, 0, ivec2(1,1));
+            // vec4 s02 = texelFetchOffset(uSampler, pix, 0, ivec2(1,1));
             vec4 s12 = texelFetchOffset(uSampler, pix, 0, ivec2(1,0));
-            vec4 s22 = texelFetchOffset(uSampler, pix, 0, ivec2(1,-1));
+            // vec4 s22 = texelFetchOffset(uSampler, pix, 0, ivec2(1,-1));
             if(any(notEqual(s10, s12)) || any(notEqual(s01, s21))){
-                return vec3(1.0,1.0,0.0);
+                return vec3(1.0,1.0,1.0);
             }
             else{
-                return vec3(1.0,1.0,1.0);
+                return vec3(0.0,0.0,0.0);
             }
         }
         void main(void) {
@@ -183,9 +184,6 @@ class App {
             while(this.currCircles.length !== 0 && this.currCircles[0].radius > Math.hypot(this.app.view.width, this.app.view.height)){
                 const circle = this.currCircles.shift();
                 
-                // if(circle.color > this.app.renderer.background.color){
-                //     this.app.renderer.background.color = circle.color;
-                // }
                 circle.obj.destroy()
             }
         }
@@ -205,7 +203,7 @@ class App {
                     const colorCode = (pixelData[index] << 16) + (pixelData[index + 1] << 8) + pixelData[index + 2]
                     
                     
-                    const circle = new Circle(pointer.clientX, pointer.clientY, colorCode + 100);
+                    const circle = new Circle(pointer.clientX, pointer.clientY, colorCode + 1);
                     this.currCircles.push(circle);
                     
                     circle.obj.zIndex = circle.color
@@ -240,10 +238,10 @@ class App {
             
             const sprite = PIXI.Sprite.from(renderTarget)
             
-            sprite.filters = [filter];
+            sprite.filters = [filter, new PIXI.BlurFilter()];
 
-            sprite.anchor.y = 1;     /* 0 = top, 0.5 = center, 1 = bottom */
-            sprite.scale.y *= -1; 
+            // sprite.anchor.y = 1;     /* 0 = top, 0.5 = center, 1 = bottom */
+            // sprite.scale.y *= -1; 
             this.app.stage.addChild(sprite);
         }
 
