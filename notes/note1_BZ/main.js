@@ -185,7 +185,7 @@ class App {
 
         const growCircle = delta => {
             for (let circle of this.currCircles) {
-                circle.addRad(delta * 10);
+                circle.addRad(delta * 2);
                 circle.obj.scale.x = circle.radius/100
                 circle.obj.scale.y = circle.radius/100
 
