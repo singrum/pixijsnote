@@ -53,13 +53,13 @@ class App {
         const downEvent = e => {
 
             if ('ontouchstart' in window) {
-                window.addEventListener("touchmove", moveEvent, false);
+                this.app.view.addEventListener("touchmove", moveEvent, false);
                 this.currPointers = e.targetTouches;
                 
 
             }
             else {
-                window.addEventListener("mousemove", moveEvent, false);
+                this.app.view.addEventListener("mousemove", moveEvent, false);
                 this.currPointers = [e];
                 
 
@@ -77,7 +77,7 @@ class App {
         }
         const upEvent = e => {
             if ('ontouchstart' in window) {
-                window.removeEventListener("touchmove", moveEvent, false)
+                this.app.view.removeEventListener("touchmove", moveEvent, false)
                 const temp = [];
                 for(let p of this.currPointers){
                     let include = false;
@@ -93,7 +93,7 @@ class App {
                 this.currPointers = temp;
             }
             else {
-                window.removeEventListener("mousemove", moveEvent, false)
+                this.app.view.removeEventListener("mousemove", moveEvent, false)
                 this.currPointers = []
             }
 
@@ -101,13 +101,13 @@ class App {
 
 
         if ('ontouchstart' in window) {
-            window.addEventListener('touchstart', downEvent);
-            window.addEventListener('touchend', upEvent);
+            this.app.view.addEventListener('touchstart', downEvent);
+            this.app.view.addEventListener('touchend', upEvent);
         }
         else {
 
-            window.addEventListener('mousedown', downEvent);
-            window.addEventListener('mouseup', upEvent);
+            this.app.view.addEventListener('mousedown', downEvent);
+            this.app.view.addEventListener('mouseup', upEvent);
         }
 
     }
