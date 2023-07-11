@@ -118,25 +118,63 @@ class App {
         const circleContainer = new PIXI.Container()
         this.app.stage.addChild(circleContainer)
 
+        // V Shader
+        const vertexShader = /*glsl*/`#version 300 es
+        precision highp float; 
 
+        in vec2 aVertexPosition; 
+        in vec2 aTextureCoord;
 
-        // Fragment Shader
-        var fragmentShader = /*glsl*/`
-        varying vec2 vTextureCoord;
-        uniform sampler2D uSampler;
-        uniform vec4 inputSize;
-        uniform float uCustomUniform;
+        uniform mat3 projectionMatrix;
+
+        out vec2 vTextureCoord;
+        
 
         void main(void) {
-            vec2 vUv = vTextureCoord;
-            vec2 coord = vTextureCoord * inputSize.xy;
 
-            vec4 color = texelFetch(uSampler, coord,2);
+            gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+            vTextureCoord = aTextureCoord;
+            
+        }`
+
+        // Fragment Shader
+        var fragmentShader = /*glsl*/`#version 300 es
+        precision highp float; 
+
+        in vec2 vTextureCoord;
+        out vec4 fragColor;
+
+
+        uniform sampler2D uSampler;
+        
+        uniform float uCustomUniform;
+
+        vec3 edgeDetect(){
+            ivec2 pix = ivec2(gl_FragCoord.xy);
+            vec4 s00 = texelFetchOffset(uSampler, pix, 0, ivec2(-1,1));
+            vec4 s10 = texelFetchOffset(uSampler, pix, 0, ivec2(-1,0));
+            vec4 s20 = texelFetchOffset(uSampler, pix, 0, ivec2(-1,-1));
+            vec4 s01 = texelFetchOffset(uSampler, pix, 0, ivec2(0,1));
+            vec4 s21 = texelFetchOffset(uSampler, pix, 0, ivec2(0,-1));
+            vec4 s02 = texelFetchOffset(uSampler, pix, 0, ivec2(1,1));
+            vec4 s12 = texelFetchOffset(uSampler, pix, 0, ivec2(1,0));
+            vec4 s22 = texelFetchOffset(uSampler, pix, 0, ivec2(1,-1));
+            if(any(notEqual(s10, s12)) || any(notEqual(s01, s21))){
+                return vec3(1.0,1.0,0.0);
+            }
+            else{
+                return vec3(1.0,1.0,1.0);
+            }
+        }
+        void main(void) {
+            vec2 vUv = vTextureCoord;
             // vec4 color = texture2D(uSampler, vUv);
-            gl_FragColor = vec4(color.xyz, 1.0);
+
+
+            fragColor = vec4(edgeDetect(), 1.0);
         }
         `;
-        const filter = new PIXI.Filter(undefined, fragmentShader, {uCostomUniform : 1});
+        const filter = new PIXI.Filter(vertexShader, fragmentShader, {uCostomUniform : 1});
         filter.filterArea = this.app.renderer.screen
 
         
@@ -145,9 +183,9 @@ class App {
             while(this.currCircles.length !== 0 && this.currCircles[0].radius > Math.hypot(this.app.view.width, this.app.view.height)){
                 const circle = this.currCircles.shift();
                 
-                if(circle.color > this.app.renderer.background.color){
-                    this.app.renderer.background.color = circle.color;
-                }
+                // if(circle.color > this.app.renderer.background.color){
+                //     this.app.renderer.background.color = circle.color;
+                // }
                 circle.obj.destroy()
             }
         }
@@ -202,9 +240,10 @@ class App {
             
             const sprite = PIXI.Sprite.from(renderTarget)
             
-
-            
             sprite.filters = [filter];
+
+            sprite.anchor.y = 1;     /* 0 = top, 0.5 = center, 1 = bottom */
+            sprite.scale.y *= -1; 
             this.app.stage.addChild(sprite);
         }
 
