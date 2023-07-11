@@ -115,21 +115,29 @@ class App {
         let counter = 0;
         const period = 10;
         this.currCircles = [];
-
+        
 
         
         const discardCircle = () => {
             if (this.currCircles.length === 0) { return; }
-
-            if (this.currCircles[0].radius > Math.hypot(this.app.view.width, this.app.view.height)) {
+            let i = 0;
+            while(this.currCircles[0].radius > Math.hypot(this.app.view.width, this.app.view.height)){
                 const circle = this.currCircles.shift();
-                this.app.renderer.background.color = circle.color
+                if(circle.color > this.app.renderer.background.color){
+                    this.app.renderer.background.color = circle.color;
+                }
                 circle.obj.destroy()
+                this.app.stage.removeChild(circle)
+                
+                
+                i++
+            }
 
 
 
             }
-        }
+
+        
         const makeCircle = delta => {
             counter += delta
             if (counter > period) {
@@ -141,17 +149,34 @@ class App {
                     const index = ((Math.floor(pointer.clientY)) * this.app.view.width + Math.floor(pointer.clientX)) * 4;
                     // 픽셀 데이터에서 해당 좌표의 채널(R, G, B, A) 값을 추출
                     
-                    const red = pixelData[index];
-                    const green = pixelData[index + 1];
-                    const blue = pixelData[index + 2];
-                    const colorCode = (red << 16) + (green << 8) + blue
-                    console.log(colorCode)
+                    const colorCode = (pixelData[index] << 16) + (pixelData[index + 1] << 8) + pixelData[index + 2]
+                    
                     
                     const circle = new Circle(pointer.clientX, pointer.clientY, colorCode + 100);
                     this.currCircles.push(circle);
+                    
+                    circle.obj.zIndex = circle.color
+
+
+
+                    // if(this.currCircles.length === 0){
+                    //     this.currCircles.push(circle)
+                    // }
+                    // for(let i = this.currCircles.length - 1; i >=0; i--){
+                    //     if(this.currCircles[i].color < circle.color){
+                    //         this.currCircles.splice(i + 1, 0, circle);
+                    //         break;
+                    //     }
+                    // }
+                    
+
+                    
                     this.app.stage.addChild(circle.obj)
                     
-                    discardCircle();
+                    discardCircle()
+                    this.app.stage.sortChildren()
+                    // console.log(this.app.stage.children.map(e=>e.zindex))
+
                 }
 
                 
@@ -160,7 +185,7 @@ class App {
 
         const growCircle = delta => {
             for (let circle of this.currCircles) {
-                circle.addRad(delta * 2);
+                circle.addRad(delta * 10);
                 circle.obj.scale.x = circle.radius/100
                 circle.obj.scale.y = circle.radius/100
 
