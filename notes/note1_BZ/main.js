@@ -117,8 +117,8 @@ class App {
         const setAuto = ()=>{
             this.auto = true;
             this.currPointers = [];
-            const length = 10;
-            for(let i = 0; i<length ; i++){
+            const pointerLen = 6;
+            for(let i = 0; i<pointerLen ; i++){
                 const pointer = {
                     clientX :Math.random() * this.app.view.width,
                     clientY : Math.random() * this.app.view.height
@@ -328,7 +328,7 @@ class App {
             if (counter > period) {
                 counter = 0;
                 if(this.auto){
-                    for(let i = 0; i < 6; i++){
+                    for(let i = 0; i < 3; i++){
                         const rani = Math.floor(Math.random() * this.currPointers.length);
                         this.currPointers[rani].clientX = Math.random() * this.app.view.width
                         this.currPointers[rani].clientY = Math.random() * this.app.view.height
