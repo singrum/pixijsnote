@@ -21,7 +21,7 @@ class Circle {
         obj.lineStyle(0);
         obj.beginFill(this.color);
 
-        obj.drawCircle(0, 0, 100);
+        obj.drawCircle(0, 0, 20);
         obj.x = this.centerX
         obj.y = this.centerY
 
@@ -39,7 +39,10 @@ class App {
             width: window.innerWidth, height: window.innerHeight,
             backgroundColor: 1, // 배경 색상을 불투명한 검은색으로 설정합니다.
             transparent: false,
-            renderer : PIXI.WebGLRenderer
+            renderer : PIXI.WebGLRenderer,
+            premultipliedAlpha : false,
+            
+            antialias: false
         });
         this.app = app;
         // this.app.renderer.resolution = window.devicePixelRatio
@@ -275,54 +278,21 @@ class App {
             `
         }
 
-        const bloomFilterGLSL = {
-            vs : /*glsl*/`#version 300 es
-            precision highp float; 
-    
-            in vec2 aVertexPosition; 
-            in vec2 aTextureCoord;
-    
-            uniform mat3 projectionMatrix;
-    
-            out vec2 vTextureCoord;
-            
-    
-            void main(void) {
-    
-                gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
-                vTextureCoord = aTextureCoord;
-                
-            }`,
-            fs : /*glsl*/`#version 300 es
-            precision highp float; 
-            in vec2 vTextureCoord;
-            out vec4 pixel;
-
-            uniform sampler2D uEdgeTex;
-            uniform sampler2D uSampler;
-            void main() {
-                
-
-                pixel = texture(uEdgeTex, vTextureCoord);
-            }`
-        }
-
 
 
         const edgeFilter = new PIXI.Filter(edgeFilterGLSL.vs, edgeFilterGLSL.fs);
-        // const bloomFilter = new PIXI.Filter(bloomFilterGLSL.vs, bloomFilterGLSL.fs);
         
         
+        this.hypot = Math.hypot(window.innerWidth, window.innerHeight)
         const discardCircle = () => {
             
-            while(this.currCircles.length !== 0 && this.currCircles[0].radius > Math.hypot(this.app.view.width, this.app.view.height)){
+            while(this.currCircles.length !== 0 && this.currCircles[0].radius > this.hypot){
                 const circle = this.currCircles.shift();
-                
                 circle.obj.destroy()
             }
         }
 
-        
+        const ext = this.app.renderer.extract
         const makeCircle = delta => {
             counter += delta
             if (counter > period) {
@@ -330,19 +300,20 @@ class App {
                 if(this.auto){
                     for(let i = 0; i < 3; i++){
                         const rani = Math.floor(Math.random() * this.currPointers.length);
-                        this.currPointers[rani].clientX = Math.random() * this.app.view.width
-                        this.currPointers[rani].clientY = Math.random() * this.app.view.height
+                        this.currPointers[rani].clientX = Math.random() * window.innerWidth
+                        this.currPointers[rani].clientY = Math.random() * window.innerHeight
                     }
                     
 
                 }
                     
-
+                
                 for (let pointer of this.currPointers) {
                     
-                    const pixelData = this.app.renderer.extract.pixels();
-                    const index = ((Math.floor(pointer.clientY)) * this.app.view.width + Math.floor(pointer.clientX)) * 4;
-                    // 픽셀 데이터에서 해당 좌표의 채널(R, G, B, A) 값을 추출
+                    const pixelData = ext.pixels();
+                    
+                    const index = ((Math.floor(pointer.clientY)) * window.innerWidth + Math.floor(pointer.clientX)) * 4;
+                  
                     
                     const colorCode = (pixelData[index] << 16) + (pixelData[index + 1] << 8) + pixelData[index + 2]
                     
@@ -367,38 +338,20 @@ class App {
         const growCircle = delta => {
             for (let circle of this.currCircles) {
                 circle.addRad(delta * 1.5);
-                circle.obj.scale.x = circle.radius/100
-                circle.obj.scale.y = circle.radius/100
+                circle.obj.scale.x = circle.radius/20
+                circle.obj.scale.y = circle.radius/20
 
             }
         }
 
 
-        const renderTarget = PIXI.RenderTexture.create({ width: this.app.renderer.width, height: this.app.renderer.height }); 
-        // const renderTargetEdge = PIXI.RenderTexture.create({ width: this.app.renderer.width, height: this.app.renderer.height }); 
+        const renderTarget = PIXI.RenderTexture.create({ width: window.innerWidth, height: window.innerHeight }); 
         let sprite =  new PIXI.Sprite(renderTarget)
         sprite.filters = [edgeFilter, new PIXI.FXAAFilter()];
         const applyFilter = () => {
             
             
             this.app.renderer.render(this.app.stage, {renderTexture : renderTarget});
-            
-            
-            
-            
-
-            // this.app.renderer.render(this.app.stage, {renderTexture : renderTargetEdge});
-            // sprite = PIXI.Sprite.from(renderTargetEdge)
-
-            // bloomFilter.uniforms.uEdgeTex = renderTargetEdge
-            // sprite.filters = [edgeFilter, new PIXI.BlurFilter(), bloomFilter];
-
-            
-            
-
-
-            // sprite.anchor.y = 1; 
-            // sprite.scale.y *= -1; 
             this.app.stage.addChild(sprite);
         }
 
