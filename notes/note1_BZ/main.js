@@ -48,12 +48,17 @@ class App {
         // this.app.renderer.resolution = window.devicePixelRatio
         
         document.body.appendChild(app.view);
+
+
+
+
         this.setInteraction();
         this.setBackground();
         this.setTicker();
         
 
     }
+    
     setInteraction() {
         this.currPointers = [];
         const downEvent = e => {
