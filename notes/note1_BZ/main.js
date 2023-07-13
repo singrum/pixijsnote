@@ -137,98 +137,131 @@ class App {
 
 
 
-        // V Shader
-        const vertexShader = /*glsl*/`#version 300 es
-        precision highp float; 
-
-        in vec2 aVertexPosition; 
-        in vec2 aTextureCoord;
-
-        uniform mat3 projectionMatrix;
-
-        out vec2 vTextureCoord;
-        
-
-        void main(void) {
-
-            gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
-            vTextureCoord = aTextureCoord;
+        const edgeFilterGLSL = {
+            vs : /*glsl*/`#version 300 es
+            precision highp float; 
+    
+            in vec2 aVertexPosition; 
+            in vec2 aTextureCoord;
+    
+            uniform mat3 projectionMatrix;
+    
+            out vec2 vTextureCoord;
             
-        }`
-
-        // Fragment Shader
-        var fragmentShader = /*glsl*/`#version 300 es
-        precision highp float; 
-
-        in vec2 vTextureCoord;
-        out vec4 fragColor;
-
-
-        uniform sampler2D uSampler;
-        
-        uniform float uTime;
-        float hue2rgb(float h, float p, float q)
-        {
-            if (h < 0.0) h += 1.0;
-            if (h > 1.0) h -= 1.0;
-        
-            if (h < 1.0 / 6.0)
-                return p + (q - p) * 6.0 * h;
-            else if (h < 1.0 / 2.0)
-                return q;
-            else if (h < 2.0 / 3.0)
-                return p + (q - p) * (2.0 / 3.0 - h) * 6.0;
-            else
-                return p;
-        }
-        vec3 hsl2rgb(vec3 hsl)
-        {
-            vec3 rgb;
-            float h = hsl.x;
-            float s = hsl.y;
-            float l = hsl.z;
-        
-            float q = l < 0.5 ? l * (1.0 + s) : l + s - l * s;
-            float p = 2.0 * l - q;
-        
-            rgb.r = hue2rgb(h + 1.0 / 3.0, p, q);
-            rgb.g = hue2rgb(h, p, q);
-            rgb.b = hue2rgb(h - 1.0 / 3.0, p, q);
-        
-            return rgb;
-        }
-        
-
-        vec3 edgeDetect(){
-            ivec2 pix = ivec2(gl_FragCoord.xy);
-            vec4 s10 = texelFetchOffset(uSampler, pix, 0, ivec2(-2,0));
-            vec4 s01 = texelFetchOffset(uSampler, pix, 0, ivec2(0,2));
-            vec4 s21 = texelFetchOffset(uSampler, pix, 0, ivec2(0,-2));
-            vec4 s12 = texelFetchOffset(uSampler, pix, 0, ivec2(2,0));
-            if(all(equal(s10, vec4(0.0)))||all(equal(s01, vec4(0.0)))||all(equal(s21, vec4(0.0)))||all(equal(s12, vec4(0.0)))){
-                return vec3(0.0,0.0,0.0);
-            }
-            if(any(notEqual(s10, s12)) || any(notEqual(s01, s21))){
-                vec4 s = texelFetchOffset(uSampler, pix, 0, ivec2(0,0));
-                vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 1.0, 0.7);
-                return hsl2rgb(hsl);
-                // return vec3(1.0,1.0,1.0);
+    
+            void main(void) {
+    
+                gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+                vTextureCoord = aTextureCoord;
                 
+            }`,
+            fs : /*glsl*/`#version 300 es
+            precision highp float; 
+    
+            in vec2 vTextureCoord;
+            out vec4 fragColor;
+    
+    
+            uniform sampler2D uSampler;
+            
+            float hue2rgb(float h, float p, float q)
+            {
+                if (h < 0.0) h += 1.0;
+                if (h > 1.0) h -= 1.0;
+            
+                if (h < 1.0 / 6.0)
+                    return p + (q - p) * 6.0 * h;
+                else if (h < 1.0 / 2.0)
+                    return q;
+                else if (h < 2.0 / 3.0)
+                    return p + (q - p) * (2.0 / 3.0 - h) * 6.0;
+                else
+                    return p;
             }
-            else{
-                return vec3(0.0,0.0,0.0);
+            vec3 hsl2rgb(vec3 hsl)
+            {
+                vec3 rgb;
+                float h = hsl.x;
+                float s = hsl.y;
+                float l = hsl.z;
+            
+                float q = l < 0.5 ? l * (1.0 + s) : l + s - l * s;
+                float p = 2.0 * l - q;
+            
+                rgb.r = hue2rgb(h + 1.0 / 3.0, p, q);
+                rgb.g = hue2rgb(h, p, q);
+                rgb.b = hue2rgb(h - 1.0 / 3.0, p, q);
+            
+                return rgb;
             }
+            
+    
+            vec3 edgeDetect(){
+                ivec2 pix = ivec2(gl_FragCoord.xy);
+                vec4 s10 = texelFetchOffset(uSampler, pix, 0, ivec2(-2,0));
+                vec4 s01 = texelFetchOffset(uSampler, pix, 0, ivec2(0,2));
+                vec4 s21 = texelFetchOffset(uSampler, pix, 0, ivec2(0,-2));
+                vec4 s12 = texelFetchOffset(uSampler, pix, 0, ivec2(2,0));
+                if(all(equal(s10, vec4(0.0)))||all(equal(s01, vec4(0.0)))||all(equal(s21, vec4(0.0)))||all(equal(s12, vec4(0.0)))){
+                    return vec3(0.0,0.0,0.0);
+                }
+                if(any(notEqual(s10, s12)) || any(notEqual(s01, s21))){
+                    vec4 s = texelFetchOffset(uSampler, pix, 0, ivec2(0,0));
+                    vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 1.0, 0.7);
+                    return hsl2rgb(hsl);
+                    // return vec3(1.0,1.0,1.0);
+                    
+                }
+                else{
+                    return vec3(0.0,0.0,0.0);
+                }
+            }
+            void main(void) {
+                vec2 vUv = vTextureCoord;
+    
+    
+                fragColor = vec4(edgeDetect(), 1.0);
+            }
+            `
         }
-        void main(void) {
-            vec2 vUv = vTextureCoord;
+
+        const bloomFilterGLSL = {
+            vs : /*glsl*/`#version 300 es
+            precision highp float; 
+    
+            in vec2 aVertexPosition; 
+            in vec2 aTextureCoord;
+    
+            uniform mat3 projectionMatrix;
+    
+            out vec2 vTextureCoord;
+            
+    
+            void main(void) {
+    
+                gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+                vTextureCoord = aTextureCoord;
+                
+            }`,
+            fs : /*glsl*/`#version 300 es
+            precision highp float; 
+            in vec2 vTextureCoord;
+            out vec4 pixel;
+
+            uniform sampler2D uEdgeTex;
+            uniform sampler2D uSampler;
+            void main() {
+                
+
+                pixel = texture(uEdgeTex, vTextureCoord);
+            }`
+        }
 
 
-            fragColor = vec4(edgeDetect(), 1.0);
-        }
-        `;
-        const filter = new PIXI.Filter(vertexShader, fragmentShader, {uTime : 1});
+
+        const edgeFilter = new PIXI.Filter(edgeFilterGLSL.vs, edgeFilterGLSL.fs);
+        const bloomFilter = new PIXI.Filter(bloomFilterGLSL.vs, bloomFilterGLSL.fs);
         
-
         
         const discardCircle = () => {
             
@@ -281,16 +314,27 @@ class App {
 
 
         const renderTarget = PIXI.RenderTexture.create({ width: this.app.renderer.width, height: this.app.renderer.height }); 
+        const renderTargetEdge = PIXI.RenderTexture.create({ width: this.app.renderer.width, height: this.app.renderer.height }); 
+        let sprite =  new PIXI.Sprite(renderTarget)
         
         const applyFilter = () => {
             
             
             this.app.renderer.render(this.app.stage, {renderTexture : renderTarget});
             
-            const sprite = PIXI.Sprite.from(renderTarget)
             
-            sprite.filters = [filter, new PIXI.FXAAFilter()];
             
+            sprite.filters = [edgeFilter, new PIXI.FXAAFilter()];
+
+            // this.app.renderer.render(this.app.stage, {renderTexture : renderTargetEdge});
+            // sprite = PIXI.Sprite.from(renderTargetEdge)
+
+            // bloomFilter.uniforms.uEdgeTex = renderTargetEdge
+            // sprite.filters = [edgeFilter, new PIXI.BlurFilter(), bloomFilter];
+
+            
+            
+
 
             // sprite.anchor.y = 1; 
             // sprite.scale.y *= -1; 
@@ -300,8 +344,6 @@ class App {
         this.app.ticker.add(delta => {
             this.app.stage.children.length = 2
             this.app.renderer.render(this.app.stage)
-            uTime += delta;
-            filter.uniforms.uTime = uTime;
             
             makeCircle(delta);
             growCircle(delta);
