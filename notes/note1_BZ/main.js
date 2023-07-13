@@ -20,11 +20,12 @@ class Circle {
         const obj = new PIXI.Graphics()
         obj.lineStyle(0);
         obj.beginFill(this.color);
-
+        // obj.drawRect(-20,-20,40,40)
         obj.drawCircle(0, 0, 20);
+        
         obj.x = this.centerX
         obj.y = this.centerY
-
+        
         return obj;
     }
 }
@@ -185,7 +186,7 @@ class App {
         
     }
     setTicker() {
-        let uTime = 0;
+        
         let counter = 0;
         const period = 10;
         this.currCircles = [];
@@ -298,30 +299,34 @@ class App {
         }
 
         const ext = this.app.renderer.extract
+        
         const makeCircle = delta => {
             counter += delta
             if (counter > period) {
                 counter = 0;
                 if(this.auto){
                     for(let i = 0; i < 3; i++){
-                        const rani = Math.floor(Math.random() * this.currPointers.length);
-                        this.currPointers[rani].clientX = Math.random() * window.innerWidth
+                        const ran = Math.random()
+                        const rani = Math.floor(ran * this.currPointers.length);
+                        this.currPointers[rani].clientX = ran * window.innerWidth
                         this.currPointers[rani].clientY = Math.random() * window.innerHeight
                     }
-                    
-
                 }
                     
-                
                 for (let pointer of this.currPointers) {
                     
-                    const pixelData = ext.pixels();
                     
-                    const index = ((Math.floor(pointer.clientY)) * window.innerWidth + Math.floor(pointer.clientX)) * 4;
-                  
                     
-                    const colorCode = (pixelData[index] << 16) + (pixelData[index + 1] << 8) + pixelData[index + 2]
                     
+                    
+                    const pixelData = ext.pixels(undefined, {
+                        x : Math.floor(pointer.clientX), 
+                        y : window.innerHeight - Math.floor(pointer.clientY), 
+                        width : 1, 
+                        height : 1})
+                    
+                    
+                    const colorCode = (pixelData[0] << 16) + (pixelData[1] << 8) + pixelData[2]
                     
                     const circle = new Circle(pointer.clientX, pointer.clientY, colorCode + 1);
                     this.currCircles.push(circle);
