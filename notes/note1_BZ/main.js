@@ -33,6 +33,7 @@ class App {
 
     constructor() {
         PIXI.settings.RESOLUTION = window.devicePixelRatio
+        PIXI.SCALE_MODES= PIXI.SCALE_MODES.LINEA
     
         const app = new PIXI.Application({
             width: window.innerWidth, height: window.innerHeight,
@@ -41,8 +42,8 @@ class App {
             renderer : PIXI.WebGLRenderer
         });
         this.app = app;
-
-
+        this.app.renderer.resolution = window.devicePixelRatio
+        
         document.body.appendChild(app.view);
         this.setInteraction();
         this.setBackground();
@@ -288,11 +289,11 @@ class App {
             
             const sprite = PIXI.Sprite.from(renderTarget)
             
-            sprite.filters = [filter];
+            sprite.filters = [filter, new PIXI.FXAAFilter()];
             
 
-            sprite.anchor.y = 1; 
-            sprite.scale.y *= -1; 
+            // sprite.anchor.y = 1; 
+            // sprite.scale.y *= -1; 
             this.app.stage.addChild(sprite);
         }
 
