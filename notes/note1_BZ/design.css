@@ -14,3 +14,30 @@ body {
     width: 100%;
     height: 100%;
 }
+.check-btn{
+    border-radius: 0px;
+    width : 100px;
+    height : 40px;
+    display : flex;
+    align-items: center;
+    justify-content: center;
+    border : 2px solid white;
+    font-size: 1.2em;
+    color : white;
+}
+
+.check-btn-set{
+    position : absolute;
+    right : 3px;
+    top : 3px;
+    display : flex;
+    width : 240px;
+    justify-content: flex-end;
+    align-items: center;
+
+}
+.check-btn-set>label{
+    color : white;
+    font-size : 1em;
+
+}

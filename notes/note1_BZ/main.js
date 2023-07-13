@@ -104,14 +104,64 @@ class App {
 
 
         if ('ontouchstart' in window) {
-            this.app.view.addEventListener('touchstart', downEvent);
-            this.app.view.addEventListener('touchend', upEvent);
+            this.app.view.addEventListener('touchstart', downEvent,false);
+            this.app.view.addEventListener('touchend', upEvent,false);
         }
         else {
 
-            this.app.view.addEventListener('mousedown', downEvent);
-            this.app.view.addEventListener('mouseup', upEvent);
+            this.app.view.addEventListener('mousedown', downEvent,false);
+            this.app.view.addEventListener('mouseup', upEvent,false);
         }
+
+
+        const setAuto = ()=>{
+            this.auto = true;
+            this.currPointers = [];
+            const length = 10;
+            for(let i = 0; i<length ; i++){
+                const pointer = {
+                    clientX :Math.random() * this.app.view.width,
+                    clientY : Math.random() * this.app.view.height
+                }
+                this.currPointers.push(pointer);
+            }
+            
+        }
+
+        this.checkBox = document.querySelector("#auto");
+        this.checkBox.addEventListener('click', ()=>{
+            if(this.checkBox.checked){
+                this.auto = true;
+                setAuto();
+
+                if ('ontouchstart' in window) {
+                    this.app.view.removeEventListener('touchstart', downEvent,false);
+                    this.app.view.removeEventListener('touchend', upEvent,false);
+                }
+                else {
+        
+                    this.app.view.removeEventListener('mousedown', downEvent,false);
+                    this.app.view.removeEventListener('mouseup', upEvent,false);
+                }
+
+            }
+            else {
+                this.auto = false;
+                this.currPointers = [];
+
+
+                if ('ontouchstart' in window) {
+                    this.app.view.addEventListener('touchstart', downEvent,false);
+                    this.app.view.addEventListener('touchend', upEvent,false);
+                }
+                else {
+        
+                    this.app.view.addEventListener('mousedown', downEvent,false);
+                    this.app.view.addEventListener('mouseup', upEvent,false);
+                }
+            };
+        });
+
 
     }
 
@@ -260,7 +310,7 @@ class App {
 
 
         const edgeFilter = new PIXI.Filter(edgeFilterGLSL.vs, edgeFilterGLSL.fs);
-        const bloomFilter = new PIXI.Filter(bloomFilterGLSL.vs, bloomFilterGLSL.fs);
+        // const bloomFilter = new PIXI.Filter(bloomFilterGLSL.vs, bloomFilterGLSL.fs);
         
         
         const discardCircle = () => {
@@ -277,6 +327,16 @@ class App {
             counter += delta
             if (counter > period) {
                 counter = 0;
+                if(this.auto){
+                    for(let i = 0; i < 6; i++){
+                        const rani = Math.floor(Math.random() * this.currPointers.length);
+                        this.currPointers[rani].clientX = Math.random() * this.app.view.width
+                        this.currPointers[rani].clientY = Math.random() * this.app.view.height
+                    }
+                    
+
+                }
+                    
 
                 for (let pointer of this.currPointers) {
                     
@@ -299,6 +359,7 @@ class App {
 
                 }
 
+
                 
             }
         }
@@ -314,9 +375,9 @@ class App {
 
 
         const renderTarget = PIXI.RenderTexture.create({ width: this.app.renderer.width, height: this.app.renderer.height }); 
-        const renderTargetEdge = PIXI.RenderTexture.create({ width: this.app.renderer.width, height: this.app.renderer.height }); 
+        // const renderTargetEdge = PIXI.RenderTexture.create({ width: this.app.renderer.width, height: this.app.renderer.height }); 
         let sprite =  new PIXI.Sprite(renderTarget)
-        
+        sprite.filters = [edgeFilter, new PIXI.FXAAFilter()];
         const applyFilter = () => {
             
             
@@ -324,7 +385,7 @@ class App {
             
             
             
-            sprite.filters = [edgeFilter, new PIXI.FXAAFilter()];
+            
 
             // this.app.renderer.render(this.app.stage, {renderTexture : renderTargetEdge});
             // sprite = PIXI.Sprite.from(renderTargetEdge)
