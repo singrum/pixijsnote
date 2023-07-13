@@ -42,7 +42,7 @@ class App {
             renderer : PIXI.WebGLRenderer
         });
         this.app = app;
-        this.app.renderer.resolution = window.devicePixelRatio
+        // this.app.renderer.resolution = window.devicePixelRatio
         
         document.body.appendChild(app.view);
         this.setInteraction();
