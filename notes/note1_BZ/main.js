@@ -33,7 +33,7 @@ class App {
 
     constructor() {
         PIXI.settings.RESOLUTION = window.devicePixelRatio
-        PIXI.SCALE_MODES= PIXI.SCALE_MODES.LINEA
+        
     
         const app = new PIXI.Application({
             width: window.innerWidth, height: window.innerHeight,
