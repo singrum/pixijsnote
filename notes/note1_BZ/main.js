@@ -219,9 +219,10 @@ class App {
             in vec2 aVertexPosition; 
             in vec2 aTextureCoord;
     
+            out vec2 vTextureCoord;
+
             uniform mat3 projectionMatrix;
     
-            out vec2 vTextureCoord;
             
     
             void main(void) {
@@ -292,8 +293,6 @@ class App {
                 }
             }
             void main(void) {
-                vec2 vUv = vTextureCoord;
-    
     
                 fragColor = vec4(edgeDetect(), 1.0);
             }
@@ -301,8 +300,87 @@ class App {
         }
 
 
-
-        const edgeFilter = new PIXI.Filter(edgeFilterGLSL.vs, edgeFilterGLSL.fs);
+        const edgeFilterGLSL2 = {
+            vs : /*glsl*/`
+    
+            attribute vec2 aVertexPosition; 
+            attribute vec2 aTextureCoord; 
+            uniform mat3 projectionMatrix;
+            varying vec2 vUv;
+    
+            void main(void) {
+    
+                gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+                vUv = aTextureCoord;
+                
+            }`,
+            fs : /*glsl*/`
+    
+            varying vec2 vUv;
+    
+            uniform sampler2D uSampler;
+            
+            float hue2rgb(float h, float p, float q)
+            {
+                if (h < 0.0) h += 1.0;
+                if (h > 1.0) h -= 1.0;
+            
+                if (h < 1.0 / 6.0)
+                    return p + (q - p) * 6.0 * h;
+                else if (h < 1.0 / 2.0)
+                    return q;
+                else if (h < 2.0 / 3.0)
+                    return p + (q - p) * (2.0 / 3.0 - h) * 6.0;
+                else
+                    return p;
+            }
+            vec3 hsl2rgb(vec3 hsl)
+            {
+                vec3 rgb;
+                float h = hsl.x;
+                float s = hsl.y;
+                float l = hsl.z;
+            
+                float q = l < 0.5 ? l * (1.0 + s) : l + s - l * s;
+                float p = 2.0 * l - q;
+            
+                rgb.r = hue2rgb(h + 1.0 / 3.0, p, q);
+                rgb.g = hue2rgb(h, p, q);
+                rgb.b = hue2rgb(h - 1.0 / 3.0, p, q);
+            
+                return rgb;
+            }
+            
+    
+            vec3 edgeDetect(){
+                // ivec2 pix = ivec2(gl_FragCoord.xy);
+                // vec4 s10 = texelFetchOffset(uSampler, pix, 0, ivec2(-2,0));
+                // vec4 s01 = texelFetchOffset(uSampler, pix, 0, ivec2(0,2));
+                // vec4 s21 = texelFetchOffset(uSampler, pix, 0, ivec2(0,-2));
+                // vec4 s12 = texelFetchOffset(uSampler, pix, 0, ivec2(2,0));
+                // if(all(equal(s10, vec4(0.0)))||all(equal(s01, vec4(0.0)))||all(equal(s21, vec4(0.0)))||all(equal(s12, vec4(0.0)))){
+                //     return vec3(0.0,0.0,0.0);
+                // }
+                // if(any(notEqual(s10, s12)) || any(notEqual(s01, s21))){
+                //     vec4 s = texelFetchOffset(uSampler, pix, 0, ivec2(0,0));
+                //     vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 1.0, 0.7);
+                //     return hsl2rgb(hsl);
+                //     // return vec3(1.0,1.0,1.0);
+                    
+                // }
+                // else{
+                //     return vec3(0.0,0.0,0.0);
+                // }
+                return vec3(1.0,1.0,0.0);
+            }
+            void main(void) {
+    
+    
+                gl_FragColor = vec4(edgeDetect(), 1.0);
+            }
+            `
+        }
+        const edgeFilter = new PIXI.Filter(edgeFilterGLSL2.vs, edgeFilterGLSL2.fs);
         
         
         this.hypot = Math.hypot(window.innerWidth, window.innerHeight)
@@ -344,7 +422,7 @@ class App {
                     
                     const colorCode = (pixelData[0] << 16) + (pixelData[1] << 8) + pixelData[2]
                     
-                    const circle = new Circle(pointer.clientX, pointer.clientY, colorCode + 20);
+                    const circle = new Circle(pointer.clientX, pointer.clientY, colorCode + 1);
                     this.currCircles.push(circle);
                     
                     circle.obj.zIndex = circle.color
@@ -373,7 +451,7 @@ class App {
 
         const renderTarget = PIXI.RenderTexture.create({ width: window.innerWidth, height: window.innerHeight }); 
         let sprite =  new PIXI.Sprite(renderTarget)
-        sprite.filters = [ edgeFilter,new PIXI.FXAAFilter()];
+        sprite.filters = [edgeFilter, new PIXI.FXAAFilter()];
         const applyFilter = () => {
             
             
