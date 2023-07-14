@@ -52,56 +52,15 @@ class App {
 
 
 
-
+        this.setupGUI();
         this.setInteraction();
         this.setBackground();
         this.setTicker();
         
 
     }
-    _setupGUI(){
-        const setAuto = ()=>{
-            this.auto = true;
-            this.currPointers = [];
-            const pointerLen = 6;
-            for(let i = 0; i<pointerLen ; i++){
-                const pointer = {
-                    clientX :Math.random() * this.app.view.width,
-                    clientY : Math.random() * this.app.view.height
-                }
-                this.currPointers.push(pointer);
-            }
-            
-        }
+    setupGUI(){
 
-		const gui = new GUI();
-
-        const settings = {
-            auto: false,
-            "number of pointer" : 5
-        };
-
-		var guiElement = gui.domElement;
-		
-		guiElement.style.position = 'absolute';  // 절대 위치 설정
-		guiElement.style.top = '0';          // 원하는 상단 위치
-		guiElement.style.right = '0';   
-		guiElement.style.margin = '0';
-		gui.add( settings, 'auto' )
-        .name("Auto")
-		.onChange( ()=> {
-			this.auto = true;
-            if ('ontouchstart' in window) {
-                this.app.view.removeEventListener('touchstart', downEvent,false);
-                this.app.view.removeEventListener('touchend', upEvent,false);
-            }
-            else {
-    
-                this.app.view.removeEventListener('mousedown', downEvent,false);
-                this.app.view.removeEventListener('mouseup', upEvent,false);
-            }
-
-		} );
 
 
 	}
@@ -169,10 +128,10 @@ class App {
 
 
         const setAuto = ()=>{
-            this.auto = true;
+            
             this.currPointers = [];
-            const pointerLen = 6;
-            for(let i = 0; i<pointerLen ; i++){
+            
+            for(let i = 0; i<this.pointerNum ; i++){
                 const pointer = {
                     clientX :Math.random() * this.app.view.width,
                     clientY : Math.random() * this.app.view.height
@@ -182,11 +141,52 @@ class App {
             
         }
 
-        this.checkBox = document.querySelector("#auto");
-        this.checkBox.addEventListener('click', ()=>{
-            if(this.checkBox.checked){
-                this.auto = true;
-                setAuto();
+        // this.checkBox = document.querySelector("#auto");
+        // this.checkBox.addEventListener('click', ()=>{
+        //     if(this.checkBox.checked){
+        //         this.auto = true;
+        //         setAuto();
+
+        //         if ('ontouchstart' in window) {
+        //             this.app.view.removeEventListener('touchstart', downEvent,false);
+        //             this.app.view.removeEventListener('touchend', upEvent,false);
+        //         }
+        //         else {
+        
+        //             this.app.view.removeEventListener('mousedown', downEvent,false);
+        //             this.app.view.removeEventListener('mouseup', upEvent,false);
+        //         }
+
+        //     }
+        //     else {
+        //         this.auto = false;
+        //         this.currPointers = [];
+
+
+        //         if ('ontouchstart' in window) {
+        //             this.app.view.addEventListener('touchstart', downEvent,false);
+        //             this.app.view.addEventListener('touchend', upEvent,false);
+        //         }
+        //         else {
+        
+        //             this.app.view.addEventListener('mousedown', downEvent,false);
+        //             this.app.view.addEventListener('mouseup', upEvent,false);
+        //         }
+        //     };
+        // });
+
+		const gui = new dat.GUI();
+		var guiElement = gui.domElement;
+		this.auto = false;
+		// guiElement.style.position = 'absolute';  // 절대 위치 설정
+		// guiElement.style.top = '0';          // 원하는 상단 위치
+		// guiElement.style.right = '0';   
+		// guiElement.style.margin = '0';
+		gui.add( this, 'auto' )
+		.onChange( ()=> {
+            if(this.auto){
+               setAuto();
+               
 
                 if ('ontouchstart' in window) {
                     this.app.view.removeEventListener('touchstart', downEvent,false);
@@ -197,10 +197,8 @@ class App {
                     this.app.view.removeEventListener('mousedown', downEvent,false);
                     this.app.view.removeEventListener('mouseup', upEvent,false);
                 }
-
             }
-            else {
-                this.auto = false;
+            else{
                 this.currPointers = [];
 
 
@@ -214,9 +212,17 @@ class App {
                     this.app.view.addEventListener('mouseup', upEvent,false);
                 }
             };
-        });
+		} );
+        this.pointerNum = 4;
+        gui.add( this, 'pointerNum',1,5 ).step(1).name("pointer number")
+		.onChange( ()=> {
+            
+            if(this.auto){
+               setAuto();
+            }
+		} );
 
-
+        
     }
 
     setBackground(){
@@ -350,7 +356,7 @@ class App {
             if (counter > period) {
                 counter = 0;
                 if(this.auto){
-                    for(let i = 0; i < 3; i++){
+                    for(let i = 0; i < this.pointerNum / 2; i++){
                         const ran = Math.random()
                         const rani = Math.floor(ran * this.currPointers.length);
                         this.currPointers[rani].clientX = ran * window.innerWidth
