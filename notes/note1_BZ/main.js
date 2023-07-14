@@ -372,7 +372,7 @@ class App {
                     
                     const pixelData = ext.pixels(undefined, {
                         x : Math.floor(pointer.clientX), 
-                        y : window.innerHeight - Math.floor(pointer.clientY), 
+                        y : Math.floor(window.innerHeight) - Math.floor(pointer.clientY), 
                         width : 1, 
                         height : 1})
                     
