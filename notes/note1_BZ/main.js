@@ -318,7 +318,7 @@ class App {
             }`,
             fs : /*glsl*/`
     
-            varying vec2 vUv;
+            varying vec2 vTextureCoord;
             uniform float width;
             uniform float height;
             uniform sampler2D uSampler;
@@ -382,7 +382,7 @@ class App {
             }
             `
         }
-        const edgeFilter = new PIXI.Filter(edgeFilterGLSL2.vs, edgeFilterGLSL2.fs);
+        const edgeFilter = new PIXI.Filter(undefined, edgeFilterGLSL2.fs);
         edgeFilter.uniforms.width = window.innerWidth
         edgeFilter.uniforms.height = window.innerHeight
 
@@ -456,7 +456,7 @@ class App {
         const renderTarget = PIXI.RenderTexture.create({ width: window.innerWidth, height: window.innerHeight }); 
         let sprite =  new PIXI.Sprite(renderTarget)
         sprite.filters = [edgeFilter, new PIXI.FXAAFilter()];
-        console.log(sprite.filters)
+        
         const applyFilter = () => {
             
             
