@@ -34,7 +34,6 @@ class App {
 
     constructor() {
         PIXI.settings.RESOLUTION = window.devicePixelRatio
-        
     
         const app = new PIXI.Application({
             width: window.innerWidth, height: window.innerHeight,
@@ -215,7 +214,7 @@ class App {
 
         const edgeFilterGLSL = {
             vs : /*glsl*/`#version 300 es
-            precision highp float; 
+            precision mediump float;
     
             in vec2 aVertexPosition; 
             in vec2 aTextureCoord;
@@ -232,7 +231,7 @@ class App {
                 
             }`,
             fs : /*glsl*/`#version 300 es
-            precision highp float; 
+            precision mediump float;
     
             in vec2 vTextureCoord;
             out vec4 fragColor;
