@@ -373,6 +373,7 @@ class App {
 
         const renderTarget = PIXI.RenderTexture.create({ width: window.innerWidth, height: window.innerHeight }); 
         let sprite =  new PIXI.Sprite(renderTarget)
+        PIXI.Filter.defaultResolution = 0.8
         sprite.filters = [edgeFilter, new PIXI.FXAAFilter()];
         const applyFilter = () => {
             
