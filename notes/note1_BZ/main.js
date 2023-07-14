@@ -344,7 +344,7 @@ class App {
                     
                     const colorCode = (pixelData[0] << 16) + (pixelData[1] << 8) + pixelData[2]
                     
-                    const circle = new Circle(pointer.clientX, pointer.clientY, colorCode + 1);
+                    const circle = new Circle(pointer.clientX, pointer.clientY, colorCode + 10);
                     this.currCircles.push(circle);
                     
                     circle.obj.zIndex = circle.color
@@ -374,7 +374,7 @@ class App {
         const renderTarget = PIXI.RenderTexture.create({ width: window.innerWidth, height: window.innerHeight }); 
         let sprite =  new PIXI.Sprite(renderTarget)
         PIXI.Filter.defaultResolution = 0.8
-        sprite.filters = [edgeFilter, new PIXI.FXAAFilter()];
+        sprite.filters = [ new PIXI.FXAAFilter()];
         const applyFilter = () => {
             
             
