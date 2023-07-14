@@ -409,11 +409,12 @@ class App {
         const renderTarget = PIXI.RenderTexture.create({ width: window.innerWidth, height: window.innerHeight }); 
         let sprite =  new PIXI.Sprite(renderTarget)
         sprite.filters = [edgeFilter,new PIXI.FXAAFilter()];
+	this.app.stage.addChild(sprite);    
         const applyFilter = () => {
             
             
             this.app.renderer.render(this.app.stage, {renderTexture : renderTarget});
-            this.app.stage.addChild(sprite);
+        
         }
 	    
 
