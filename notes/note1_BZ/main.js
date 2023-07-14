@@ -306,7 +306,9 @@ class App {
             attribute vec2 aVertexPosition; 
             attribute vec2 aTextureCoord; 
             uniform mat3 projectionMatrix;
+            
             varying vec2 vUv;
+
     
             void main(void) {
     
@@ -317,8 +319,10 @@ class App {
             fs : /*glsl*/`
     
             varying vec2 vUv;
-    
+            uniform float width;
+            uniform float height;
             uniform sampler2D uSampler;
+
             
             float hue2rgb(float h, float p, float q)
             {
@@ -371,7 +375,27 @@ class App {
                 // else{
                 //     return vec3(0.0,0.0,0.0);
                 // }
-                return vec3(1.0,1.0,0.0);
+
+                
+                vec4 s10 = texture2D(uSampler, vec2((gl_FragCoord.x - 2.0) / width, gl_FragCoord.y / height));
+                vec4 s01 = texture2D(uSampler, vec2(gl_FragCoord.x / width, (gl_FragCoord.y + 2.0) / height));
+                vec4 s21 = texture2D(uSampler, vec2(gl_FragCoord.x / width, (gl_FragCoord.y - 2.0) / height));
+                vec4 s12 = texture2D(uSampler, vec2((gl_FragCoord.x + 2.0) / width, gl_FragCoord.y / height));
+                // if(all(equal(s10, vec4(0.0)))||all(equal(s01, vec4(0.0)))||all(equal(s21, vec4(0.0)))||all(equal(s12, vec4(0.0)))){
+                //     return vec3(0.0,0.0,0.0);
+                // }
+                if(any(notEqual(s10, s12)) || any(notEqual(s01, s21))){
+                    vec4 s = texture2D(uSampler, vec2(gl_FragCoord.x / width, gl_FragCoord.y / height));
+                    vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 1.0, 0.7);
+                    return hsl2rgb(hsl);
+                    // return vec3(1.0,1.0,1.0);
+                    
+                }
+                else{
+                    return vec3(0.0,0.0,0.0);
+                }
+                // return vec3(gl_FragCoord);
+                // return vec3(1.0,1.0,0.0);
             }
             void main(void) {
     
@@ -381,7 +405,9 @@ class App {
             `
         }
         const edgeFilter = new PIXI.Filter(edgeFilterGLSL2.vs, edgeFilterGLSL2.fs);
-        
+        edgeFilter.uniforms.width = window.innerWidth
+        edgeFilter.uniforms.height = window.innerHeight
+
         
         this.hypot = Math.hypot(window.innerWidth, window.innerHeight)
         const discardCircle = () => {
