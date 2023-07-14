@@ -408,14 +408,14 @@ class App {
 
         const renderTarget = PIXI.RenderTexture.create({ width: window.innerWidth, height: window.innerHeight }); 
         let sprite =  new PIXI.Sprite(renderTarget)
-        //sprite.filters = [edgeFilter, new PIXI.FXAAFilter()];
+        sprite.filters = [edgeFilter, new PIXI.FXAAFilter()];
         const applyFilter = () => {
             
             
             this.app.renderer.render(this.app.stage, {renderTexture : renderTarget});
             this.app.stage.addChild(sprite);
         }
-	    console.log(this.app)
+	    
 
         this.app.ticker.add(delta => {
             this.app.stage.children.length = 2
