@@ -212,92 +212,92 @@ class App {
 
 
 
-        const edgeFilterGLSL = {
-            vs : /*glsl*/`#version 300 es
-            precision mediump float;
+        // const edgeFilterGLSL = {
+        //     vs : /*glsl*/`#version 300 es
+        //     precision mediump float;
     
-            in vec2 aVertexPosition; 
-            in vec2 aTextureCoord;
+        //     in vec2 aVertexPosition; 
+        //     in vec2 aTextureCoord;
     
-            out vec2 vTextureCoord;
+        //     out vec2 vTextureCoord;
 
-            uniform mat3 projectionMatrix;
+        //     uniform mat3 projectionMatrix;
     
             
     
-            void main(void) {
+        //     void main(void) {
     
-                gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
-                vTextureCoord = aTextureCoord;
+        //         gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+        //         vTextureCoord = aTextureCoord;
                 
-            }`,
-            fs : /*glsl*/`#version 300 es
-            precision mediump float;
+        //     }`,
+        //     fs : /*glsl*/`#version 300 es
+        //     precision mediump float;
     
-            in vec2 vTextureCoord;
-            out vec4 fragColor;
+        //     in vec2 vTextureCoord;
+        //     out vec4 fragColor;
     
     
-            uniform sampler2D uSampler;
+        //     uniform sampler2D uSampler;
             
-            float hue2rgb(float h, float p, float q)
-            {
-                if (h < 0.0) h += 1.0;
-                if (h > 1.0) h -= 1.0;
+        //     float hue2rgb(float h, float p, float q)
+        //     {
+        //         if (h < 0.0) h += 1.0;
+        //         if (h > 1.0) h -= 1.0;
             
-                if (h < 1.0 / 6.0)
-                    return p + (q - p) * 6.0 * h;
-                else if (h < 1.0 / 2.0)
-                    return q;
-                else if (h < 2.0 / 3.0)
-                    return p + (q - p) * (2.0 / 3.0 - h) * 6.0;
-                else
-                    return p;
-            }
-            vec3 hsl2rgb(vec3 hsl)
-            {
-                vec3 rgb;
-                float h = hsl.x;
-                float s = hsl.y;
-                float l = hsl.z;
+        //         if (h < 1.0 / 6.0)
+        //             return p + (q - p) * 6.0 * h;
+        //         else if (h < 1.0 / 2.0)
+        //             return q;
+        //         else if (h < 2.0 / 3.0)
+        //             return p + (q - p) * (2.0 / 3.0 - h) * 6.0;
+        //         else
+        //             return p;
+        //     }
+        //     vec3 hsl2rgb(vec3 hsl)
+        //     {
+        //         vec3 rgb;
+        //         float h = hsl.x;
+        //         float s = hsl.y;
+        //         float l = hsl.z;
             
-                float q = l < 0.5 ? l * (1.0 + s) : l + s - l * s;
-                float p = 2.0 * l - q;
+        //         float q = l < 0.5 ? l * (1.0 + s) : l + s - l * s;
+        //         float p = 2.0 * l - q;
             
-                rgb.r = hue2rgb(h + 1.0 / 3.0, p, q);
-                rgb.g = hue2rgb(h, p, q);
-                rgb.b = hue2rgb(h - 1.0 / 3.0, p, q);
+        //         rgb.r = hue2rgb(h + 1.0 / 3.0, p, q);
+        //         rgb.g = hue2rgb(h, p, q);
+        //         rgb.b = hue2rgb(h - 1.0 / 3.0, p, q);
             
-                return rgb;
-            }
+        //         return rgb;
+        //     }
             
     
-            vec3 edgeDetect(){
-                ivec2 pix = ivec2(gl_FragCoord.xy);
-                vec4 s10 = texelFetchOffset(uSampler, pix, 0, ivec2(-2,0));
-                vec4 s01 = texelFetchOffset(uSampler, pix, 0, ivec2(0,2));
-                vec4 s21 = texelFetchOffset(uSampler, pix, 0, ivec2(0,-2));
-                vec4 s12 = texelFetchOffset(uSampler, pix, 0, ivec2(2,0));
-                if(all(equal(s10, vec4(0.0)))||all(equal(s01, vec4(0.0)))||all(equal(s21, vec4(0.0)))||all(equal(s12, vec4(0.0)))){
-                    return vec3(0.0,0.0,0.0);
-                }
-                if(any(notEqual(s10, s12)) || any(notEqual(s01, s21))){
-                    vec4 s = texelFetchOffset(uSampler, pix, 0, ivec2(0,0));
-                    vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 1.0, 0.7);
-                    return hsl2rgb(hsl);
-                    // return vec3(1.0,1.0,1.0);
+        //     vec3 edgeDetect(){
+        //         ivec2 pix = ivec2(gl_FragCoord.xy);
+        //         vec4 s10 = texelFetchOffset(uSampler, pix, 0, ivec2(-2,0));
+        //         vec4 s01 = texelFetchOffset(uSampler, pix, 0, ivec2(0,2));
+        //         vec4 s21 = texelFetchOffset(uSampler, pix, 0, ivec2(0,-2));
+        //         vec4 s12 = texelFetchOffset(uSampler, pix, 0, ivec2(2,0));
+        //         if(all(equal(s10, vec4(0.0)))||all(equal(s01, vec4(0.0)))||all(equal(s21, vec4(0.0)))||all(equal(s12, vec4(0.0)))){
+        //             return vec3(0.0,0.0,0.0);
+        //         }
+        //         if(any(notEqual(s10, s12)) || any(notEqual(s01, s21))){
+        //             vec4 s = texelFetchOffset(uSampler, pix, 0, ivec2(0,0));
+        //             vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 1.0, 0.7);
+        //             return hsl2rgb(hsl);
+        //             // return vec3(1.0,1.0,1.0);
                     
-                }
-                else{
-                    return vec3(0.0,0.0,0.0);
-                }
-            }
-            void main(void) {
+        //         }
+        //         else{
+        //             return vec3(0.0,0.0,0.0);
+        //         }
+        //     }
+        //     void main(void) {
     
-                fragColor = vec4(edgeDetect(), 1.0);
-            }
-            `
-        }
+        //         fragColor = vec4(edgeDetect(), 1.0);
+        //     }
+        //     `
+        // }
 
 
         const edgeFilterGLSL2 = {
@@ -357,45 +357,23 @@ class App {
             
     
             vec3 edgeDetect(){
-                // ivec2 pix = ivec2(gl_FragCoord.xy);
-                // vec4 s10 = texelFetchOffset(uSampler, pix, 0, ivec2(-2,0));
-                // vec4 s01 = texelFetchOffset(uSampler, pix, 0, ivec2(0,2));
-                // vec4 s21 = texelFetchOffset(uSampler, pix, 0, ivec2(0,-2));
-                // vec4 s12 = texelFetchOffset(uSampler, pix, 0, ivec2(2,0));
-                // if(all(equal(s10, vec4(0.0)))||all(equal(s01, vec4(0.0)))||all(equal(s21, vec4(0.0)))||all(equal(s12, vec4(0.0)))){
-                //     return vec3(0.0,0.0,0.0);
-                // }
-                // if(any(notEqual(s10, s12)) || any(notEqual(s01, s21))){
-                //     vec4 s = texelFetchOffset(uSampler, pix, 0, ivec2(0,0));
-                //     vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 1.0, 0.7);
-                //     return hsl2rgb(hsl);
-                //     // return vec3(1.0,1.0,1.0);
-                    
-                // }
-                // else{
-                //     return vec3(0.0,0.0,0.0);
-                // }
+
 
                 
                 vec4 s10 = texture2D(uSampler, vec2((gl_FragCoord.x - 2.0) / width, gl_FragCoord.y / height));
                 vec4 s01 = texture2D(uSampler, vec2(gl_FragCoord.x / width, (gl_FragCoord.y + 2.0) / height));
                 vec4 s21 = texture2D(uSampler, vec2(gl_FragCoord.x / width, (gl_FragCoord.y - 2.0) / height));
                 vec4 s12 = texture2D(uSampler, vec2((gl_FragCoord.x + 2.0) / width, gl_FragCoord.y / height));
-                // if(all(equal(s10, vec4(0.0)))||all(equal(s01, vec4(0.0)))||all(equal(s21, vec4(0.0)))||all(equal(s12, vec4(0.0)))){
-                //     return vec3(0.0,0.0,0.0);
-                // }
+
                 if(any(notEqual(s10, s12)) || any(notEqual(s01, s21))){
                     vec4 s = texture2D(uSampler, vec2(gl_FragCoord.x / width, gl_FragCoord.y / height));
                     vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 1.0, 0.7);
                     return hsl2rgb(hsl);
-                    // return vec3(1.0,1.0,1.0);
                     
                 }
                 else{
                     return vec3(0.0,0.0,0.0);
                 }
-                // return vec3(gl_FragCoord);
-                // return vec3(1.0,1.0,0.0);
             }
             void main(void) {
     
