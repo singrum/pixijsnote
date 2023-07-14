@@ -141,47 +141,13 @@ class App {
             
         }
 
-        // this.checkBox = document.querySelector("#auto");
-        // this.checkBox.addEventListener('click', ()=>{
-        //     if(this.checkBox.checked){
-        //         this.auto = true;
-        //         setAuto();
-
-        //         if ('ontouchstart' in window) {
-        //             this.app.view.removeEventListener('touchstart', downEvent,false);
-        //             this.app.view.removeEventListener('touchend', upEvent,false);
-        //         }
-        //         else {
-        
-        //             this.app.view.removeEventListener('mousedown', downEvent,false);
-        //             this.app.view.removeEventListener('mouseup', upEvent,false);
-        //         }
-
-        //     }
-        //     else {
-        //         this.auto = false;
-        //         this.currPointers = [];
-
-
-        //         if ('ontouchstart' in window) {
-        //             this.app.view.addEventListener('touchstart', downEvent,false);
-        //             this.app.view.addEventListener('touchend', upEvent,false);
-        //         }
-        //         else {
-        
-        //             this.app.view.addEventListener('mousedown', downEvent,false);
-        //             this.app.view.addEventListener('mouseup', upEvent,false);
-        //         }
-        //     };
-        // });
-
 		const gui = new dat.GUI();
 		var guiElement = gui.domElement;
 		this.auto = false;
-		// guiElement.style.position = 'absolute';  // 절대 위치 설정
-		// guiElement.style.top = '0';          // 원하는 상단 위치
-		// guiElement.style.right = '0';   
-		// guiElement.style.margin = '0';
+		guiElement.style.position = 'absolute';  // 절대 위치 설정
+		guiElement.style.top = '0';          // 원하는 상단 위치
+		guiElement.style.right = '0';   
+		guiElement.style.margin = '0';
 		gui.add( this, 'auto' )
 		.onChange( ()=> {
             if(this.auto){
@@ -372,7 +338,7 @@ class App {
                     
                     const pixelData = ext.pixels(undefined, {
                         x : Math.floor(pointer.clientX), 
-                        y : Math.floor(window.innerHeight) - Math.floor(pointer.clientY), 
+                        y : window.innerHeight - Math.floor(pointer.clientY), 
                         width : 1, 
                         height : 1})
                     
@@ -408,14 +374,14 @@ class App {
 
         const renderTarget = PIXI.RenderTexture.create({ width: window.innerWidth, height: window.innerHeight }); 
         let sprite =  new PIXI.Sprite(renderTarget)
-        sprite.filters = [edgeFilter,new PIXI.FXAAFilter()];    
+        sprite.filters = [edgeFilter, new PIXI.FXAAFilter()];
         const applyFilter = () => {
             
-            this.app.stage.addChild(sprite);
+            
             this.app.renderer.render(this.app.stage, {renderTexture : renderTarget});
-        
+            sprite.texture = renderTarget
+            this.app.stage.addChild(sprite);
         }
-	    
 
         this.app.ticker.add(delta => {
             this.app.stage.children.length = 2
