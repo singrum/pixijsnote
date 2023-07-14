@@ -59,7 +59,52 @@ class App {
         
 
     }
+    _setupGUI(){
+        const setAuto = ()=>{
+            this.auto = true;
+            this.currPointers = [];
+            const pointerLen = 6;
+            for(let i = 0; i<pointerLen ; i++){
+                const pointer = {
+                    clientX :Math.random() * this.app.view.width,
+                    clientY : Math.random() * this.app.view.height
+                }
+                this.currPointers.push(pointer);
+            }
+            
+        }
+
+		const gui = new GUI();
+
+        const settings = {
+            auto: false,
+            "number of pointer" : 5
+        };
+
+		var guiElement = gui.domElement;
+		
+		guiElement.style.position = 'absolute';  // 절대 위치 설정
+		guiElement.style.top = '0';          // 원하는 상단 위치
+		guiElement.style.right = '0';   
+		guiElement.style.margin = '0';
+		gui.add( settings, 'auto' )
+        .name("Auto")
+		.onChange( ()=> {
+			this.auto = true;
+            if ('ontouchstart' in window) {
+                this.app.view.removeEventListener('touchstart', downEvent,false);
+                this.app.view.removeEventListener('touchend', upEvent,false);
+            }
+            else {
     
+                this.app.view.removeEventListener('mousedown', downEvent,false);
+                this.app.view.removeEventListener('mouseup', upEvent,false);
+            }
+
+		} );
+
+
+	}
     setInteraction() {
         this.currPointers = [];
         const downEvent = e => {
