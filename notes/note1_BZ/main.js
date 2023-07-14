@@ -359,14 +359,14 @@ class App {
             vec3 edgeDetect(){
 
 
-                
-                vec4 s10 = texture2D(uSampler, vec2((gl_FragCoord.x - 2.0) / width, gl_FragCoord.y / height));
-                vec4 s01 = texture2D(uSampler, vec2(gl_FragCoord.x / width, (gl_FragCoord.y + 2.0) / height));
-                vec4 s21 = texture2D(uSampler, vec2(gl_FragCoord.x / width, (gl_FragCoord.y - 2.0) / height));
-                vec4 s12 = texture2D(uSampler, vec2((gl_FragCoord.x + 2.0) / width, gl_FragCoord.y / height));
+                vec2 size = vec2(width,height);
+                vec4 s10 = texture2D(uSampler, vec2(gl_FragCoord.x - 2.0, gl_FragCoord.y) / size);
+                vec4 s01 = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y + 2.0) / size);
+                vec4 s21 = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y - 2.0) / size);
+                vec4 s12 = texture2D(uSampler, vec2(gl_FragCoord.x + 2.0, gl_FragCoord.y) / size);
 
                 if(any(notEqual(s10, s12)) || any(notEqual(s01, s21))){
-                    vec4 s = texture2D(uSampler, vec2(gl_FragCoord.x / width, gl_FragCoord.y / height));
+                    vec4 s = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y) / size);
                     vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 1.0, 0.7);
                     return hsl2rgb(hsl);
                     
