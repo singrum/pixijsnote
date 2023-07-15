@@ -143,8 +143,8 @@ class App {
 		const gui = new dat.GUI();
 		var guiElement = gui.domElement;
 		this.auto = false;
-		guiElement.style.position = 'absolute';  // 절대 위치 설정
-		guiElement.style.top = '0';          // 원하는 상단 위치
+		guiElement.style.position = 'absolute'; 
+		guiElement.style.top = '0'; 
 		guiElement.style.right = '0';   
 		guiElement.style.margin = '0';
 		gui.add( this, 'auto' )
@@ -306,7 +306,7 @@ class App {
             }
         }
 
-        const ext = this.app.renderer.extract
+        
         
         const makeCircle = delta => {
             counter += delta
@@ -321,6 +321,9 @@ class App {
                     }
                 }
                     
+
+                const ext = this.app.renderer.extract
+                
                 for (let pointer of this.currPointers) {
                     
                     
