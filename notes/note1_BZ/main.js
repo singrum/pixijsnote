@@ -307,7 +307,7 @@ class App {
         }
 
         
-        
+        const ext = this.app.renderer.extract
         const makeCircle = delta => {
             counter += delta
             if (counter > period) {
@@ -322,7 +322,7 @@ class App {
                 }
                     
 
-                const ext = this.app.renderer.extract
+                
                 
                 for (let pointer of this.currPointers) {
                     
