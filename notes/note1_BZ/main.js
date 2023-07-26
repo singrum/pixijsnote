@@ -185,6 +185,8 @@ class App {
 		} );
         this.growingSpeed = 1.5
         gui.add( this, 'growingSpeed',1.5, 3).step(0.1).name("Growing Speed")
+        this.frequency = 1.0
+        gui.add( this, 'frequency', 0.3, 1.2).step(0.1).name("Frequency")
         
 
 
@@ -205,7 +207,7 @@ class App {
     setTicker() {
         
         let counter = 0;
-        const period = 10;
+        
         this.currCircles = [];
         const circleContainer = new PIXI.Container()
         this.app.stage.addChild(circleContainer)
@@ -276,10 +278,12 @@ class App {
                 vec4 s21 = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y - 2.0) / size);
                 vec4 s12 = texture2D(uSampler, vec2(gl_FragCoord.x + 2.0, gl_FragCoord.y) / size);
 
-                if(any(notEqual(s10, s12)) || any(notEqual(s01, s21))){
+                if((any(notEqual(s10, s12)) || any(notEqual(s01, s21)))){
+                    
                     vec4 s = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y) / size);
-                    vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 1.0, 0.7);
+                    vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 0.5, 0.7);
                     return hsl2rgb(hsl);
+                    
                     
                 }
                 else{
@@ -309,9 +313,10 @@ class App {
 
         
         const ext = this.app.renderer.extract
+        
         const makeCircle = delta => {
             counter += delta
-            if (counter > period) {
+            if (counter > 10 / this.frequency) {
                 counter = 0;
                 if(this.auto){
                     for(let i = 0; i < this.pointerNum / 2; i++){
