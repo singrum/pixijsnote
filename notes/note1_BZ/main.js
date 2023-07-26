@@ -1,6 +1,4 @@
 
-// import PIXI from "../../node_modules/pixi.js/dist/pixi.js"
-
 
 class Circle {
     constructor(centerX, centerY, color) {
@@ -20,8 +18,7 @@ class Circle {
         const obj = new PIXI.Graphics()
         obj.lineStyle(0);
         obj.beginFill(this.color);
-        // obj.drawRect(-20,-20,40,40)
-        obj.drawCircle(0, 0, 20);
+        obj.drawCircle(0, 0, 50);
         
         obj.x = this.centerX
         obj.y = this.centerY
@@ -37,7 +34,7 @@ class App {
     
         const app = new PIXI.Application({
             width: window.innerWidth, height: window.innerHeight,
-            backgroundColor: 1, // 배경 색상을 불투명한 검은색으로 설정합니다.
+            backgroundColor: 1,
             transparent: false,
             renderer : PIXI.WebGLRenderer,
             premultipliedAlpha : false,
@@ -177,15 +174,19 @@ class App {
                     this.app.view.addEventListener('mouseup', upEvent,false);
                 }
             };
-		} );
+		} ).name("Auto")
         this.pointerNum = 4;
-        gui.add( this, 'pointerNum',1,5 ).step(1).name("pointer number")
+        gui.add( this, 'pointerNum',1,5 ).step(1).name("Pointer Number")
 		.onChange( ()=> {
             
             if(this.auto){
                setAuto();
             }
 		} );
+        this.growingSpeed = 1.5
+        gui.add( this, 'growingSpeed',1.5, 3).step(0.1).name("Growing Speed")
+        
+
 
         
     }
@@ -362,9 +363,9 @@ class App {
 
         const growCircle = delta => {
             for (let circle of this.currCircles) {
-                circle.addRad(delta * 1.5);
-                circle.obj.scale.x = circle.radius/20
-                circle.obj.scale.y = circle.radius/20
+                circle.addRad(delta * this.growingSpeed);
+                circle.obj.scale.x = circle.radius/50
+                circle.obj.scale.y = circle.radius/50
 
             }
         }
