@@ -184,7 +184,7 @@ class App {
             }
 		} );
         this.growingSpeed = 1.5
-        gui.add( this, 'growingSpeed',1.5, 3).step(0.1).name("Growing Speed")
+        gui.add( this, 'growingSpeed',1, 3).step(0.1).name("Growing Speed")
         this.frequency = 1.0
         gui.add( this, 'frequency', 0.3, 1.2).step(0.1).name("Frequency")
         
