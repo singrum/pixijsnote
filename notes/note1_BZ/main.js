@@ -281,7 +281,7 @@ class App {
                 if((any(notEqual(s10, s12)) || any(notEqual(s01, s21)))){
                     
                     vec4 s = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y) / size);
-                    vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 0.5, 0.7);
+                    vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 1.0, 0.7);
                     return hsl2rgb(hsl);
                     
                     
