@@ -312,7 +312,7 @@ class App {
         const discardCircle = () => {
             
             while(this.currCircles.length !== 0 && isCircleBig(this.currCircles[0])){
-                console.log(1)
+                
                 const circle = this.currCircles.shift();
                 circle.obj.destroy()
             }
@@ -359,7 +359,7 @@ class App {
 
                     
                     let i = circleContainer.children.length;
-                    console.log(i)
+                    
                     while(i!==0&& circleContainer.getChildAt(i-1).zIndex > circle.color){
                         i--;
                     }        
