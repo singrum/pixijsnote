@@ -7,6 +7,8 @@ class Circle {
         this.radius = 0;
         this.color = color
         this.obj = this.getObj();
+        this.xInCartesian = centerX - window.innerWidth / 2
+        this.yInCartesian = centerY - window.innerHeight / 2 
     }
     addRad(x) {
         this.radius += x;
@@ -303,9 +305,14 @@ class App {
 
         
         this.hypot = Math.hypot(window.innerWidth, window.innerHeight)
+        const isCircleBig = circle =>{
+            const hypot = Math.hypot(circle.xInCartesian + Math.sign(circle.xInCartesian) * window.innerWidth / 2, circle.yInCartesian + Math.sign(circle.yInCartesian) * window.innerHeight / 2)
+            return circle.radius > hypot
+        }
         const discardCircle = () => {
             
-            while(this.currCircles.length !== 0 && this.currCircles[0].radius > this.hypot){
+            while(this.currCircles.length !== 0 && isCircleBig(this.currCircles[0])){
+                console.log(1)
                 const circle = this.currCircles.shift();
                 circle.obj.destroy()
             }
@@ -352,12 +359,13 @@ class App {
 
                     
                     let i = circleContainer.children.length;
-                    
+                    console.log(i)
                     while(i!==0&& circleContainer.getChildAt(i-1).zIndex > circle.color){
                         i--;
                     }        
 
                     circleContainer.addChildAt(circle.obj, i)
+
 
                 }
 
