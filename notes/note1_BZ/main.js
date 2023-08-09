@@ -1,4 +1,9 @@
-
+const rectSample = new PIXI.Graphics()
+rectSample.lineStyle(0);
+rectSample.beginFill(0xffffff);
+rectSample.drawCircle(0, 0, 50);
+// const circleTexture =PIXI.Texture.from('circleTexture.png');
+// const circleSprite = PIXI.Sprite.from('circleTexture.png');
 
 class Circle {
     constructor(centerX, centerY, color) {
@@ -15,11 +20,9 @@ class Circle {
 
 
 
-        const obj = new PIXI.Graphics()
-        obj.lineStyle(0);
-        obj.beginFill(0xffffff);
-        obj.drawCircle(0, 0, 50);
-        
+        const obj = new PIXI.Graphics(rectSample.geometry)
+        // const obj = PIXI.Sprite.from(circleTexture)
+        // obj.anchor(0.5)
         return obj;
     }
     setInfo(centerX, centerY, color){
@@ -57,7 +60,6 @@ class App {
             antialias: false
         });
         this.app = app;
-        // this.app.renderer.resolution = window.devicePixelRatio
         
         document.body.appendChild(app.view);
         
@@ -326,7 +328,7 @@ class App {
         const discardCircle = () => {
             
             while(currCircles.length !== 0 && isCircleBig(currCircles[0])){
-                
+                console.log(1)
                 const circle = currCircles.shift();
                 circleContainer.removeChild(circle.obj);
                 surplusCircleObj.push(circle)
@@ -335,12 +337,12 @@ class App {
         const getCircle = (x,y,color) => {  
             if(surplusCircleObj.length === 0){
                 return new Circle(x,y,color)
-                
             }
             else{
+                console.log("recycle")
                 const circle = surplusCircleObj.pop() 
                 circle.setInfo(x,y,color)
-                console.log(circle)
+                
                 return circle
             }
 
@@ -380,19 +382,19 @@ class App {
                     const circle = getCircle(pointer.clientX, pointer.clientY, colorCode + 1);
                     
 
-                    let i = currCircles.length
-                    while(i !== 0 && currCircles[i-1].getRemainingLife() > circle.getRemainingLife()){
-                        i--;
-                    }
-                    currCircles.splice(i,0,circle);
+                    // let i = currCircles.length
+                    // while(i !== 0 && currCircles[i-1].getRemainingLife() > circle.getRemainingLife()){
+                    //     i--;
+                    // }
+                    // currCircles.splice(i,0,circle);
+                    currCircles.push(circle)
                     
-                    
-                    i = circleContainer.children.length;
+                    let i = circleContainer.children.length;
                     
                     while(i!==0&& circleContainer.getChildAt(i-1).tint > circle.color){
                         i--;
                     }
-                    console.log(circleContainer.children.length, i)
+                    console.log(circleContainer.children.length)
                     circleContainer.addChildAt(circle.obj, i)
 
 
