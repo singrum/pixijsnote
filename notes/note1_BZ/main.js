@@ -27,14 +27,18 @@ class Circle {
         this.centerY = centerY
         this.radius = 0;
         this.color = color
-        this.xInCartesian = centerX - window.innerWidth / 2
-        this.yInCartesian = centerY - window.innerHeight / 2 
+        const xInCartesian = centerX - window.innerWidth / 2
+        const yInCartesian = centerY - window.innerHeight / 2 
+        this.totalLife = Math.hypot(xInCartesian + Math.sign(xInCartesian) * window.innerWidth / 2, yInCartesian + Math.sign(yInCartesian) * window.innerHeight / 2)
         this.setObjInfo()
     }
     setObjInfo(){
         this.obj.tint = this.color
         this.obj.x = this.centerX
         this.obj.y = this.centerY
+    }
+    getRemainingLife(){
+        return this.totalLife - this.radius
     }
 }
 
@@ -219,7 +223,7 @@ class App {
         
         let counter = 0;
         
-        this.currCircles = [];
+        const currCircles = [];
         const surplusCircleObj = [];
         const circleContainer = new PIXI.Container()
         this.app.stage.addChild(circleContainer)
@@ -316,14 +320,14 @@ class App {
         
         this.hypot = Math.hypot(window.innerWidth, window.innerHeight)
         const isCircleBig = circle =>{
-            const hypot = Math.hypot(circle.xInCartesian + Math.sign(circle.xInCartesian) * window.innerWidth / 2, circle.yInCartesian + Math.sign(circle.yInCartesian) * window.innerHeight / 2)
-            return circle.radius > hypot
+            
+            return circle.getRemainingLife() < 0
         }
         const discardCircle = () => {
             
-            while(this.currCircles.length !== 0 && isCircleBig(this.currCircles[0])){
+            while(currCircles.length !== 0 && isCircleBig(currCircles[0])){
                 
-                const circle = this.currCircles.shift();
+                const circle = currCircles.shift();
                 circleContainer.removeChild(circle.obj);
                 surplusCircleObj.push(circle)
             }
@@ -375,16 +379,19 @@ class App {
                     const colorCode = (pixelData[0] << 16) + (pixelData[1] << 8) + pixelData[2]
                     const circle = getCircle(pointer.clientX, pointer.clientY, colorCode + 1);
                     
-                    this.currCircles.push(circle);
-                    
-                    circle.obj.zIndex = circle.color
 
-                    
-                    let i = circleContainer.children.length;
-                    
-                    while(i!==0&& circleContainer.getChildAt(i-1).zIndex > circle.color){
+                    let i = currCircles.length
+                    while(i !== 0 && currCircles[i-1].getRemainingLife() > circle.getRemainingLife()){
                         i--;
-                    }        
+                    }
+                    currCircles.splice(i,0,circle);
+                    
+                    
+                    i = circleContainer.children.length;
+                    
+                    while(i!==0&& circleContainer.getChildAt(i-1).tint > circle.color){
+                        i--;
+                    }
                     console.log(circleContainer.children.length, i)
                     circleContainer.addChildAt(circle.obj, i)
 
@@ -397,7 +404,7 @@ class App {
         }
 
         const growCircle = delta => {
-            for (let circle of this.currCircles) {
+            for (let circle of currCircles) {
                 circle.addRad(delta * this.growingSpeed);
                 circle.obj.scale.x = circle.radius/50
                 circle.obj.scale.y = circle.radius/50
