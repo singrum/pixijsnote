@@ -214,11 +214,12 @@ class App {
         const background = new PIXI.Graphics()
         
         background.lineStyle(0);
-        background.beginFill(1);
+        background.beginFill(0xffffff);
 
         background.drawRect(0, 0, window.innerWidth, window.innerHeight);
-        
+        background.tint = 1
         this.app.stage.addChild(background);
+        this.background = background
         
     }
     setTicker() {
@@ -320,18 +321,14 @@ class App {
         edgeFilter.uniforms.height = window.innerHeight
 
         
-        this.hypot = Math.hypot(window.innerWidth, window.innerHeight)
-        const isCircleBig = circle =>{
-            
-            return circle.getRemainingLife() < 0
-        }
         const discardCircle = () => {
             
-            while(currCircles.length !== 0 && isCircleBig(currCircles[0])){
+            while(currCircles.length !== 0 && currCircles[0].getRemainingLife() < 0){
                 console.log(1)
                 const circle = currCircles.shift();
                 circleContainer.removeChild(circle.obj);
                 surplusCircleObj.push(circle)
+                this.background.tint = circle.color
             }
         }
         const getCircle = (x,y,color) => {  
@@ -381,7 +378,6 @@ class App {
                     const colorCode = (pixelData[0] << 16) + (pixelData[1] << 8) + pixelData[2]
                     const circle = getCircle(pointer.clientX, pointer.clientY, colorCode + 1);
                     
-
                     // let i = currCircles.length
                     // while(i !== 0 && currCircles[i-1].getRemainingLife() > circle.getRemainingLife()){
                     //     i--;
@@ -429,6 +425,7 @@ class App {
 
         this.app.ticker.add(delta => {
             this.app.stage.children.length = 2
+            
             this.app.renderer.render(this.app.stage)
             
             makeCircle(delta);
