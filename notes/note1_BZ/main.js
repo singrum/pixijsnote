@@ -2,13 +2,11 @@
 
 class Circle {
     constructor(centerX, centerY, color) {
-        this.centerX = centerX;
-        this.centerY = centerY;
-        this.radius = 0;
-        this.color = color
-        this.obj = this.getObj();
-        this.xInCartesian = centerX - window.innerWidth / 2
-        this.yInCartesian = centerY - window.innerHeight / 2 
+        
+
+        this.obj = this.getObj()
+        this.setInfo(centerX, centerY, color)
+
     }
     addRad(x) {
         this.radius += x;
@@ -19,13 +17,24 @@ class Circle {
 
         const obj = new PIXI.Graphics()
         obj.lineStyle(0);
-        obj.beginFill(this.color);
+        obj.beginFill(0xffffff);
         obj.drawCircle(0, 0, 50);
         
-        obj.x = this.centerX
-        obj.y = this.centerY
-        
         return obj;
+    }
+    setInfo(centerX, centerY, color){
+        this.centerX = centerX
+        this.centerY = centerY
+        this.radius = 0;
+        this.color = color
+        this.xInCartesian = centerX - window.innerWidth / 2
+        this.yInCartesian = centerY - window.innerHeight / 2 
+        this.setObjInfo()
+    }
+    setObjInfo(){
+        this.obj.tint = this.color
+        this.obj.x = this.centerX
+        this.obj.y = this.centerY
     }
 }
 
@@ -47,7 +56,7 @@ class App {
         // this.app.renderer.resolution = window.devicePixelRatio
         
         document.body.appendChild(app.view);
-
+        
 
 
         this.setupGUI();
@@ -211,6 +220,7 @@ class App {
         let counter = 0;
         
         this.currCircles = [];
+        const surplusCircleObj = [];
         const circleContainer = new PIXI.Container()
         this.app.stage.addChild(circleContainer)
 
@@ -285,7 +295,7 @@ class App {
                     vec4 s = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y) / size);
                     vec3 hsl = vec3(mod(s.b * 10.0 ,1.0), 1.0, 0.7);
                     return hsl2rgb(hsl);
-                    
+                    // return vec3(1.0,1.0,1.0);
                     
                 }
                 else{
@@ -314,13 +324,25 @@ class App {
             while(this.currCircles.length !== 0 && isCircleBig(this.currCircles[0])){
                 
                 const circle = this.currCircles.shift();
-                circle.obj.destroy()
+                circleContainer.removeChild(circle.obj);
+                surplusCircleObj.push(circle)
             }
         }
+        const getCircle = (x,y,color) => {  
+            if(surplusCircleObj.length === 0){
+                return new Circle(x,y,color)
+                
+            }
+            else{
+                const circle = surplusCircleObj.pop() 
+                circle.setInfo(x,y,color)
+                console.log(circle)
+                return circle
+            }
 
+        }
         
         const ext = this.app.renderer.extract
-        
         const makeCircle = delta => {
             counter += delta
             if (counter > 10 / this.frequency) {
@@ -351,8 +373,8 @@ class App {
                     
                     
                     const colorCode = (pixelData[0] << 16) + (pixelData[1] << 8) + pixelData[2]
+                    const circle = getCircle(pointer.clientX, pointer.clientY, colorCode + 1);
                     
-                    const circle = new Circle(pointer.clientX, pointer.clientY, colorCode + 1);
                     this.currCircles.push(circle);
                     
                     circle.obj.zIndex = circle.color
@@ -363,7 +385,7 @@ class App {
                     while(i!==0&& circleContainer.getChildAt(i-1).zIndex > circle.color){
                         i--;
                     }        
-
+                    console.log(circleContainer.children.length, i)
                     circleContainer.addChildAt(circle.obj, i)
 
 
