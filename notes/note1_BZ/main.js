@@ -5,6 +5,10 @@ rectSample.drawCircle(0, 0, 50);
 // const circleTexture =PIXI.Texture.from('circleTexture.png');
 // const circleSprite = PIXI.Sprite.from('circleTexture.png');
 
+function sign(x){
+    if(x >=0) return 1;
+    else return -1;
+}
 class Circle {
     constructor(centerX, centerY, color) {
         
@@ -32,7 +36,7 @@ class Circle {
         this.color = color
         const xInCartesian = centerX - window.innerWidth / 2
         const yInCartesian = centerY - window.innerHeight / 2 
-        this.totalLife = Math.hypot(xInCartesian + Math.sign(xInCartesian) * window.innerWidth / 2, yInCartesian + Math.sign(yInCartesian) * window.innerHeight / 2)
+        this.totalLife = Math.hypot(xInCartesian + sign(xInCartesian) * window.innerWidth / 2, yInCartesian + sign(yInCartesian) * window.innerHeight / 2)
         this.setObjInfo()
     }
     setObjInfo(){
@@ -379,13 +383,11 @@ class App {
                     
                     
                     const colorCode = (pixelData[0] << 16) + (pixelData[1] << 8) + pixelData[2]
+                    if(colorCode === 0) {
+                        continue;
+                    }
                     const circle = getCircle(pointer.clientX, pointer.clientY, colorCode + 1);
                     
-                    // let i = currCircles.length
-                    // while(i !== 0 && currCircles[i-1].getRemainingLife() > circle.getRemainingLife()){
-                    //     i--;
-                    // }
-                    // currCircles.splice(i,0,circle);
                     let i = currCircles.length
                     while(i!==0 && currCircles[i-1].color > circle.color){
                         i--;
@@ -397,8 +399,7 @@ class App {
                     
                     currCircles.splice(i,0,circle)
                     circleContainer.addChildAt(circle.obj, i)
-                    // console.log(circleContainer.children.length)
-                    // console.log(currCircles.map(e=>e.getRemainingLife()))
+                    console.log(currCircles.length)
                 }
             }
         }
