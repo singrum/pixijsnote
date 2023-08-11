@@ -327,10 +327,10 @@ class App {
                 
                 const circle = currCircles.shift();
                 prevColor = circle.color
-                circleContainer.removeChild(circle.obj);
+                circleContainer.removeChildAt(0);
                 surplusCircleObj.push(circle)
                 this.background.tint = circle.color
-                console.log(1)
+                
                 
             }
         }
@@ -339,7 +339,7 @@ class App {
                 return new Circle(x,y,color)
             }
             else{
-                console.log("recycle")
+                // console.log("recycle")
                 const circle = surplusCircleObj.pop() 
                 circle.setInfo(x,y,color)
                 
@@ -390,18 +390,21 @@ class App {
                     while(i!==0 && currCircles[i-1].color > circle.color){
                         i--;
                     }
+                    
+                    while(i!==0 && (currCircles[i-1].color === circle.color) && (currCircles[i-1].getRemainingLife() > circle.getRemainingLife())){
+                        i--;
+                    }
+                    
                     currCircles.splice(i,0,circle)
                     circleContainer.addChildAt(circle.obj, i)
-                    console.log(circleContainer.children.length)
-
+                    // console.log(circleContainer.children.length)
+                    // console.log(currCircles.map(e=>e.getRemainingLife()))
                 }
-
-
-                
             }
         }
 
         const growCircle = delta => {
+            
             for (let circle of currCircles) {
                 circle.addRad(delta * this.growingSpeed);
                 circle.obj.scale.x = circle.radius/50
