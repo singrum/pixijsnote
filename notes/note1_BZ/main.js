@@ -319,16 +319,19 @@ class App {
         const edgeFilter = new PIXI.Filter(undefined, edgeFilterGLSL2.fs);
         edgeFilter.uniforms.width = window.innerWidth
         edgeFilter.uniforms.height = window.innerHeight
-
+        const fxaaFilter = new PIXI.FXAAFilter()
         
         const discardCircle = () => {
-            
-            while(currCircles.length !== 0 && currCircles[0].getRemainingLife() < 0){
-                console.log(1)
+            let prevColor = null;
+            while(currCircles.length !== 0 && (currCircles[0].getRemainingLife() < 0 || currCircles[0].color === prevColor)){
+                
                 const circle = currCircles.shift();
+                prevColor = circle.color
                 circleContainer.removeChild(circle.obj);
                 surplusCircleObj.push(circle)
                 this.background.tint = circle.color
+                console.log(1)
+                
             }
         }
         const getCircle = (x,y,color) => {  
@@ -383,16 +386,13 @@ class App {
                     //     i--;
                     // }
                     // currCircles.splice(i,0,circle);
-                    currCircles.push(circle)
-                    
-                    let i = circleContainer.children.length;
-                    
-                    while(i!==0&& circleContainer.getChildAt(i-1).tint > circle.color){
+                    let i = currCircles.length
+                    while(i!==0 && currCircles[i-1].color > circle.color){
                         i--;
                     }
-                    console.log(circleContainer.children.length)
+                    currCircles.splice(i,0,circle)
                     circleContainer.addChildAt(circle.obj, i)
-
+                    console.log(circleContainer.children.length)
 
                 }
 
@@ -413,7 +413,7 @@ class App {
 
         const renderTarget = PIXI.RenderTexture.create({ width: window.innerWidth, height: window.innerHeight }); 
         let sprite =  new PIXI.Sprite(renderTarget)
-        sprite.filters = [edgeFilter, new PIXI.FXAAFilter()];
+        sprite.filters = [edgeFilter, fxaaFilter];
         
         const applyFilter = () => {
             
