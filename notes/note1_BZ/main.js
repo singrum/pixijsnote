@@ -52,18 +52,25 @@ class Circle {
 class App {
 
     constructor() {
-        PIXI.settings.RESOLUTION = window.devicePixelRatio
-    
+        const renderer = new PIXI.Renderer({
+            hello : true, 
+            resolution: devicePixelRatio,
+            powerPreference :"high-performance"
+        })
+        
+        console.log(renderer)
+        console.log(devicePixelRatio)
+        
         const app = new PIXI.Application({
             width: window.innerWidth, height: window.innerHeight,
             backgroundColor: 1,
             transparent: false,
-            renderer : PIXI.WebGLRenderer,
+            renderer : renderer,
             premultipliedAlpha : false,
-            
             antialias: false
         });
         this.app = app;
+        
         
         document.body.appendChild(app.view);
         
