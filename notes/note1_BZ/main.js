@@ -34,18 +34,12 @@ class Circle {
         this.centerY = centerY
         this.radius = 0;
         this.color = color
-        const xInCartesian = centerX - window.innerWidth / 2
-        const yInCartesian = centerY - window.innerHeight / 2 
-        this.totalLife = Math.hypot(xInCartesian + sign(xInCartesian) * window.innerWidth / 2, yInCartesian + sign(yInCartesian) * window.innerHeight / 2)
         this.setObjInfo()
     }
     setObjInfo(){
         this.obj.tint = this.color
         this.obj.x = this.centerX
         this.obj.y = this.centerY
-    }
-    getRemainingLife(){
-        return this.totalLife - this.radius
     }
 }
 
