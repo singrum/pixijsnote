@@ -25,8 +25,6 @@ class Circle {
 
 
         const obj = new PIXI.Graphics(rectSample.geometry)
-        // const obj = PIXI.Sprite.from(circleTexture)
-        // obj.anchor(0.5)
         return obj;
     }
     setInfo(centerX, centerY, color){
