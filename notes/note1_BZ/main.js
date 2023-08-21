@@ -50,8 +50,6 @@ class App {
             powerPreference :"high-performance"
         })
         
-        console.log(renderer)
-        console.log(devicePixelRatio)
         
         const app = new PIXI.Application({
             width: window.innerWidth, height: window.innerHeight,
@@ -339,10 +337,8 @@ class App {
                 return new Circle(x,y,color)
             }
             else{
-                // console.log("recycle")
                 const circle = surplusCircleObj.pop() 
                 circle.setInfo(x,y,color)
-                
                 return circle
             }
 
@@ -362,7 +358,7 @@ class App {
                     }
                 }
                     
-                console.log(this.currPointers, this.autoPointers)
+                
                 
                 
                 for (let pointer of this.currPointers.concat(this.autoPointers)) {
