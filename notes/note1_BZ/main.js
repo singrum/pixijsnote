@@ -87,7 +87,11 @@ class App {
 
             if ('ontouchstart' in window) {
                 this.app.view.addEventListener("touchmove", moveEvent, false);
-                this.currPointers = e.targetTouches;
+                this.currPointers = []
+                for(let p of e.targetTouches){
+                    this.currPointers.push(p);
+                }
+                
                 
 
             }
@@ -100,7 +104,11 @@ class App {
         }
         const moveEvent = e => {
             if ('ontouchstart' in window) {
-                this.currPointers = e.targetTouches
+                e.targetTouches = [];
+                for(let p of e.targetTouches){
+                    this.currPointers.push(p)
+                }
+                
 
             }
             else {
@@ -111,7 +119,7 @@ class App {
         const upEvent = e => {
             if ('ontouchstart' in window) {
                 this.app.view.removeEventListener("touchmove", moveEvent, false)
-                const temp = [];
+                this.currPointers = [];
                 for(let p of this.currPointers){
                     let include = false;
                     for(let c of e.changedTouches){
@@ -120,10 +128,9 @@ class App {
                         }
                     }
                     if(!include){
-                        temp.push(p)
+                        this.currPointers.push(p)
                     }
                 }
-                this.currPointers = temp;
             }
             else {
                 this.app.view.removeEventListener("mousemove", moveEvent, false)
@@ -354,7 +361,7 @@ class App {
                     }
                 }
                     
-
+                console.log(this.currPointers, this.autoPointers)
                 
                 
                 for (let pointer of this.currPointers.concat(this.autoPointers)) {
