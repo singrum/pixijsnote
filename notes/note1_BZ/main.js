@@ -119,7 +119,7 @@ class App {
         const upEvent = e => {
             if ('ontouchstart' in window) {
                 this.app.view.removeEventListener("touchmove", moveEvent, false)
-                this.currPointers = [];
+                const temp = [];
                 for(let p of this.currPointers){
                     let include = false;
                     for(let c of e.changedTouches){
@@ -128,9 +128,10 @@ class App {
                         }
                     }
                     if(!include){
-                        this.currPointers.push(p)
+                        temp.push(p)
                     }
                 }
+                this.currPointers = temp
             }
             else {
                 this.app.view.removeEventListener("mousemove", moveEvent, false)
