@@ -204,7 +204,7 @@ class App {
             };
 		} ).name("Auto")
         this.pointerNum = 4;
-        gui.add( this, 'pointerNum',1,5 ).step(1).name("Pointer Number")
+        gui.add( this, 'pointerNum',1,20 ).step(1).name("Pointer Number")
 		.onChange( ()=> {
             
             if(this.auto){
@@ -214,7 +214,7 @@ class App {
         this.growingSpeed = 1.5
         gui.add( this, 'growingSpeed',1, 3).step(0.1).name("Growing Speed")
         this.frequency = 1.0
-        gui.add( this, 'frequency', 0.3, 1.2).step(0.1).name("Frequency")
+        gui.add( this, 'frequency', 0.3, 1.8).step(0.1).name("Frequency")
         
 
 
@@ -236,7 +236,7 @@ class App {
     setTicker() {
         
         let counter = 0;
-        
+        let currBgColor = 1;
         const currCircles = [];
         const surplusCircleObj = [];
         const circleContainer = new PIXI.Container()
@@ -331,18 +331,24 @@ class App {
         edgeFilter.uniforms.width = window.innerWidth
         edgeFilter.uniforms.height = window.innerHeight
         const fxaaFilter = new PIXI.FXAAFilter()
-        
+        const ext = this.app.renderer.extract
+
         const discardCircle = () => {
-            let prevColor = null;
-            while(currCircles.length !== 0 && (currCircles[0].getRemainingLife() < 0 || currCircles[0].color === prevColor)){
-                
+            const pixels = ext.pixels()
+            const len = pixels.length
+            for(let i = 0;i<len / 4;i++){
+                const colorCode = (pixels[i * 4] << 16) + (pixels[i * 4 + 1] << 8) + pixels[i * 4 + 2]
+                if(colorCode === this.background.tint){
+                    return;
+                }
+            }
+            
+            this.background.tint++;
+
+            while(currCircles.length !== 0 && currCircles[0].color === this.background.tint){
                 const circle = currCircles.shift();
-                prevColor = circle.color
                 circleContainer.removeChildAt(0);
                 surplusCircleObj.push(circle)
-                this.background.tint = circle.color
-                
-                
             }
         }
         const getCircle = (x,y,color) => {  
@@ -359,7 +365,7 @@ class App {
 
         }
         
-        const ext = this.app.renderer.extract
+        
         const makeCircle = delta => {
             counter += delta
             if (counter > 10 / this.frequency) {
@@ -378,16 +384,12 @@ class App {
                 
                 for (let pointer of this.currPointers) {
                     
-                    
-                    
-                    
-                    
                     const pixelData = ext.pixels(undefined, {
                         x : Math.floor(pointer.clientX), 
                         y : window.innerHeight - 1 - Math.floor(pointer.clientY), 
                         width : 1, 
                         height : 1})
-                    
+
                     
                     const colorCode = (pixelData[0] << 16) + (pixelData[1] << 8) + pixelData[2]
                     if(colorCode === 0) {
@@ -397,10 +399,6 @@ class App {
                     
                     let i = currCircles.length
                     while(i!==0 && currCircles[i-1].color > circle.color){
-                        i--;
-                    }
-                    
-                    while(i!==0 && (currCircles[i-1].color === circle.color) && (currCircles[i-1].getRemainingLife() > circle.getRemainingLife())){
                         i--;
                     }
                     
