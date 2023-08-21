@@ -90,6 +90,7 @@ class App {
 	}
     setInteraction() {
         this.currPointers = [];
+        this.autoPointers = []
         const downEvent = e => {
 
             if ('ontouchstart' in window) {
@@ -153,14 +154,14 @@ class App {
 
         const setAuto = ()=>{
             
-            this.currPointers = [];
+            this.autoPointers = [];
             
             for(let i = 0; i<this.pointerNum ; i++){
                 const pointer = {
                     clientX :Math.random() * this.app.view.width,
                     clientY : Math.random() * this.app.view.height
                 }
-                this.currPointers.push(pointer);
+                this.autoPointers.push(pointer);
             }
             
         }
@@ -178,29 +179,11 @@ class App {
                setAuto();
                
 
-                if ('ontouchstart' in window) {
-                    this.app.view.removeEventListener('touchstart', downEvent,false);
-                    this.app.view.removeEventListener('touchend', upEvent,false);
-                }
-                else {
-        
-                    this.app.view.removeEventListener('mousedown', downEvent,false);
-                    this.app.view.removeEventListener('mouseup', upEvent,false);
-                }
             }
             else{
                 this.currPointers = [];
+                this.autoPointers = [];
 
-
-                if ('ontouchstart' in window) {
-                    this.app.view.addEventListener('touchstart', downEvent,false);
-                    this.app.view.addEventListener('touchend', upEvent,false);
-                }
-                else {
-        
-                    this.app.view.addEventListener('mousedown', downEvent,false);
-                    this.app.view.addEventListener('mouseup', upEvent,false);
-                }
             };
 		} ).name("Auto")
         this.pointerNum = 4;
@@ -373,16 +356,16 @@ class App {
                 if(this.auto){
                     for(let i = 0; i < this.pointerNum / 2; i++){
                         const ran = Math.random()
-                        const rani = Math.floor(ran * this.currPointers.length);
-                        this.currPointers[rani].clientX = ran * window.innerWidth
-                        this.currPointers[rani].clientY = Math.random() * window.innerHeight
+                        const rani = Math.floor(ran * this.autoPointers.length);
+                        this.autoPointers[rani].clientX = ran * window.innerWidth
+                        this.autoPointers[rani].clientY = Math.random() * window.innerHeight
                     }
                 }
                     
 
                 
                 
-                for (let pointer of this.currPointers) {
+                for (let pointer of this.currPointers.concat(this.autoPointers)) {
                     
                     const pixelData = ext.pixels(undefined, {
                         x : Math.floor(pointer.clientX), 
