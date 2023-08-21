@@ -104,7 +104,7 @@ class App {
         }
         const moveEvent = e => {
             if ('ontouchstart' in window) {
-                e.currPointers = [];
+                this.currPointers = [];
                 for(let p of e.targetTouches){
                     this.currPointers.push(p)
                 }
