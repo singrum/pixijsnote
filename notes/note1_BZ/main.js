@@ -217,7 +217,6 @@ class App {
     setTicker() {
         
         let counter = 0;
-        let currBgColor = 1;
         const currCircles = [];
         const surplusCircleObj = [];
         const circleContainer = new PIXI.Container()
@@ -293,12 +292,12 @@ class App {
                     
                     vec4 s = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y) / size);
                     vec3 hsl = vec3(mod(s.b * 4.0 ,1.0), 1.0, 0.7);
-                    // return hsl2rgb(hsl);
-                    return vec3(0.501960784313,1.0,0.8588235294117647);
+                    return hsl2rgb(hsl);
+                    // return vec3(0.501960784313,1.0,0.8588235294117647);
                     
                 }
                 else{
-                    return vec3(0.21568627450980393,0.023529411764705882,0.09019607843137255);
+                    return vec3(0.1,0.1,0.1);
                 }
             }
             void main(void) {
