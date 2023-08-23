@@ -313,7 +313,7 @@ class App {
         edgeFilter.uniforms.height = window.innerHeight
         const fxaaFilter = new PIXI.FXAAFilter()
         const ext = this.app.renderer.extract
-        const colorPointer = 0
+        let colorPointer = 0
 
         const discardCircle = () => {
             const pixels = ext.pixels()
