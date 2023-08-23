@@ -313,17 +313,19 @@ class App {
         edgeFilter.uniforms.height = window.innerHeight
         const fxaaFilter = new PIXI.FXAAFilter()
         const ext = this.app.renderer.extract
+        const colorPointer = 0
 
         const discardCircle = () => {
             const pixels = ext.pixels()
             const len = pixels.length
-            for(let i = 0;i<len / 4;i++){
-                const colorCode = (pixels[i * 4] << 16) + (pixels[i * 4 + 1] << 8) + pixels[i * 4 + 2]
+            while(colorPointer<len/4){
+                const colorCode = (pixels[colorPointer * 4] << 16) + (pixels[colorPointer * 4 + 1] << 8) + pixels[colorPointer * 4 + 2]
                 if(colorCode === this.background.tint){
                     return;
                 }
+                colorPointer++;
             }
-            
+            colorPointer = 0;
             this.background.tint++;
 
             while(currCircles.length !== 0 && currCircles[0].color === this.background.tint){
