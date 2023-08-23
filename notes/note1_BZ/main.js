@@ -2,16 +2,13 @@ const rectSample = new PIXI.Graphics()
 rectSample.lineStyle(0);
 rectSample.beginFill(0xffffff);
 rectSample.drawCircle(0, 0, 50);
-// const circleTexture =PIXI.Texture.from('circleTexture.png');
-// const circleSprite = PIXI.Sprite.from('circleTexture.png');
-
 function sign(x){
     if(x >=0) return 1;
     else return -1;
 }
 class Circle {
     constructor(centerX, centerY, color) {
-        
+
 
         this.obj = this.getObj()
         this.setInfo(centerX, centerY, color)
@@ -22,8 +19,7 @@ class Circle {
     }
     getObj() {
 
-
-
+        
         const obj = new PIXI.Graphics(rectSample.geometry)
         return obj;
     }
@@ -287,17 +283,18 @@ class App {
                 vec4 s01 = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y + 2.0) / size);
                 vec4 s21 = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y - 2.0) / size);
                 vec4 s12 = texture2D(uSampler, vec2(gl_FragCoord.x + 2.0, gl_FragCoord.y) / size);
-
+                vec4 s = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y) / size);
                 if((any(notEqual(s10, s12)) || any(notEqual(s01, s21)))){
                     
-                    vec4 s = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y) / size);
+                    
                     vec3 hsl = vec3(mod(s.b * 4.0 ,1.0), 1.0, 0.7);
                     return hsl2rgb(hsl);
-                    // return vec3(0.501960784313,1.0,0.8588235294117647);
                     
                 }
                 else{
+                    
                     return vec3(0.1,0.1,0.1);
+                    
                 }
             }
             void main(void) {
@@ -317,12 +314,14 @@ class App {
         const discardCircle = () => {
             const pixels = ext.pixels()
             const len = pixels.length
-            while(colorPointer<len/4){
-                const colorCode = (pixels[colorPointer * 4] << 16) + (pixels[colorPointer * 4 + 1] << 8) + pixels[colorPointer * 4 + 2]
+            while(colorPointer < len){
+                
+                const colorCode = (pixels[colorPointer] << 16) + (pixels[colorPointer + 1] << 8) + pixels[colorPointer + 2]
                 if(colorCode === this.background.tint){
                     return;
+                    
                 }
-                colorPointer++;
+                colorPointer += 4;
             }
             colorPointer = 0;
             this.background.tint++;
@@ -349,7 +348,7 @@ class App {
         const makeCircle = delta => {
             counter += delta
             if (counter > 10 / this.frequency) {
-                counter = 0;
+                counter %= 10 / this.frequency;
                 if(this.auto){
                     for(let i = 0; i < this.pointerNum / 2; i++){
                         const ran = Math.random()
@@ -373,7 +372,7 @@ class App {
                     
                     const colorCode = (pixelData[0] << 16) + (pixelData[1] << 8) + pixelData[2]
                     if(colorCode === 0) {
-                        continue;
+                        console.log("error")
                     }
                     const circle = getCircle(pointer.clientX, pointer.clientY, colorCode + 1);
                     
@@ -398,7 +397,6 @@ class App {
 
             }
         }
-
 
         const renderTarget = PIXI.RenderTexture.create({ width: window.innerWidth, height: window.innerHeight }); 
         let sprite =  new PIXI.Sprite(renderTarget)
