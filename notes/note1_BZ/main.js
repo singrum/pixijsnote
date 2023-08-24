@@ -20,8 +20,9 @@ class Circle {
     getObj() {
 
         
-        const obj = new PIXI.Graphics(rectSample.geometry)
-        return obj;
+        const outer = new PIXI.Graphics(rectSample.geometry)
+        const inner = new PIXI.Graphics(rectSample.geometry)
+        return [inner,outer];
     }
     setInfo(centerX, centerY, color){
         this.centerX = centerX
@@ -31,9 +32,10 @@ class Circle {
         this.setObjInfo()
     }
     setObjInfo(){
-        this.obj.tint = this.color
-        this.obj.x = this.centerX
-        this.obj.y = this.centerY
+        this.obj[0].tint = 0xffffff
+        this.obj[1].tint = this.color
+        this.obj[0].x = this.centerX; this.obj[1].x = this.centerX
+        this.obj[0].y = this.centerY; this.obj[1].y = this.centerY
     }
 }
 
@@ -41,7 +43,6 @@ class App {
 
     constructor() {
         const renderer = new PIXI.Renderer({
-            hello : true, 
             resolution: devicePixelRatio,
             powerPreference :"high-performance"
         })
@@ -219,22 +220,92 @@ class App {
         this.app.stage.addChild(circleContainer)
 
 
-        const edgeFilterGLSL2 = {
-            vs : /*glsl*/`
+        // const edgeFilterGLSL2 = {
+        //     vs : /*glsl*/`
     
-            attribute vec2 aVertexPosition; 
-            attribute vec2 aTextureCoord; 
-            uniform mat3 projectionMatrix;
+        //     attribute vec2 aVertexPosition; 
+        //     attribute vec2 aTextureCoord; 
+        //     uniform mat3 projectionMatrix;
             
-            varying vec2 vUv;
+        //     varying vec2 vUv;
 
     
-            void main(void) {
+        //     void main(void) {
     
-                gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
-                vUv = aTextureCoord;
+        //         gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+        //         vUv = aTextureCoord;
                 
-            }`,
+        //     }`,
+        //     fs : /*glsl*/`
+    
+        //     varying vec2 vTextureCoord;
+        //     uniform float width;
+        //     uniform float height;
+        //     uniform sampler2D uSampler;
+
+            
+        //     float hue2rgb(float h, float p, float q)
+        //     {
+        //         if (h < 0.0) h += 1.0;
+        //         if (h > 1.0) h -= 1.0;
+            
+        //         if (h < 1.0 / 6.0)
+        //             return p + (q - p) * 6.0 * h;
+        //         else if (h < 1.0 / 2.0)
+        //             return q;
+        //         else if (h < 2.0 / 3.0)
+        //             return p + (q - p) * (2.0 / 3.0 - h) * 6.0;
+        //         else
+        //             return p;
+        //     }
+        //     vec3 hsl2rgb(vec3 hsl)
+        //     {
+        //         vec3 rgb;
+        //         float h = hsl.x;
+        //         float s = hsl.y;
+        //         float l = hsl.z;
+            
+        //         float q = l < 0.5 ? l * (1.0 + s) : l + s - l * s;
+        //         float p = 2.0 * l - q;
+            
+        //         rgb.r = hue2rgb(h + 1.0 / 3.0, p, q);
+        //         rgb.g = hue2rgb(h, p, q);
+        //         rgb.b = hue2rgb(h - 1.0 / 3.0, p, q);
+            
+        //         return rgb;
+        //     }
+            
+    
+        //     vec3 edgeDetect(){
+
+
+        //         vec2 size = vec2(width,height);
+        //         vec4 s10 = texture2D(uSampler, vec2(gl_FragCoord.x - 2.0, gl_FragCoord.y) / size);
+        //         vec4 s01 = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y + 2.0) / size);
+        //         vec4 s21 = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y - 2.0) / size);
+        //         vec4 s12 = texture2D(uSampler, vec2(gl_FragCoord.x + 2.0, gl_FragCoord.y) / size);
+        //         vec4 s = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y) / size);
+        //         if((any(notEqual(s10, s12)) || any(notEqual(s01, s21)))){
+                    
+                    
+        //             vec3 hsl = vec3(mod(s.b * 4.0 ,1.0), 1.0, 0.7);
+        //             return hsl2rgb(hsl);
+                    
+        //         }
+        //         else{
+                    
+        //             return vec3(0.1,0.1,0.1);
+                    
+        //         }
+        //     }
+        //     void main(void) {
+    
+    
+        //         gl_FragColor = vec4(edgeDetect(), 1.0);
+        //     }
+        //     `
+        // }
+        const edgeFilterGLSL2 = {
             fs : /*glsl*/`
     
             varying vec2 vTextureCoord;
@@ -275,32 +346,20 @@ class App {
             }
             
     
-            vec3 edgeDetect(){
-
-
+            vec3 color(){
                 vec2 size = vec2(width,height);
-                vec4 s10 = texture2D(uSampler, vec2(gl_FragCoord.x - 2.0, gl_FragCoord.y) / size);
-                vec4 s01 = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y + 2.0) / size);
-                vec4 s21 = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y - 2.0) / size);
-                vec4 s12 = texture2D(uSampler, vec2(gl_FragCoord.x + 2.0, gl_FragCoord.y) / size);
                 vec4 s = texture2D(uSampler, vec2(gl_FragCoord.x, gl_FragCoord.y) / size);
-                if((any(notEqual(s10, s12)) || any(notEqual(s01, s21)))){
-                    
-                    
-                    vec3 hsl = vec3(mod(s.b * 4.0 ,1.0), 1.0, 0.7);
-                    return hsl2rgb(hsl);
-                    
+                if(any(notEqual(s, vec4(1.0,1.0,1.0,1.0)))){
+                    return vec3(0.1,0.1,0.1);
                 }
                 else{
-                    
-                    return vec3(0.1,0.1,0.1);
-                    
+                    return vec3(1.0,1.0,1.0);
                 }
             }
             void main(void) {
     
     
-                gl_FragColor = vec4(edgeDetect(), 1.0);
+                gl_FragColor = vec4(color(), 1.0);
             }
             `
         }
@@ -315,22 +374,32 @@ class App {
             const pixels = ext.pixels()
             const len = pixels.length
             while(colorPointer < len){
-                
                 const colorCode = (pixels[colorPointer] << 16) + (pixels[colorPointer + 1] << 8) + pixels[colorPointer + 2]
                 if(colorCode === this.background.tint){
                     return;
-                    
                 }
                 colorPointer += 4;
             }
             colorPointer = 0;
             this.background.tint++;
+            let i = 0;
 
-            while(currCircles.length !== 0 && currCircles[0].color === this.background.tint){
+            // while(currCircles.length !== 0 && currCircles[0].color === this.background.tint){
+            //     circleContainer.removeChildren(0,2);
+            //     const circle = currCircles.shift();
+            //     surplusCircleObj.push(circle)
+            // }
+            while(currCircles.length !== i && currCircles[i].color === this.background.tint){
+                i++
+            }
+            circleContainer.removeChildren(0,2 * i);
+            for(;i>0;i--){
                 const circle = currCircles.shift();
-                circleContainer.removeChildAt(0);
                 surplusCircleObj.push(circle)
             }
+            
+            
+            
         }
         const getCircle = (x,y,color) => {  
             if(surplusCircleObj.length === 0){
@@ -371,8 +440,8 @@ class App {
 
                     
                     const colorCode = (pixelData[0] << 16) + (pixelData[1] << 8) + pixelData[2]
-                    if(colorCode === 0) {
-                        console.log("error")
+                    if(colorCode === 0xffffff) {
+                        continue
                     }
                     const circle = getCircle(pointer.clientX, pointer.clientY, colorCode + 1);
                     
@@ -380,10 +449,20 @@ class App {
                     while(i!==0 && currCircles[i-1].color > circle.color){
                         i--;
                     }
+                    let j = i;
+                    while(j!==0 && currCircles[j-1].color == circle.color){
+                        j--;
+                    }
+                    //j < i
+                    //i는 circle.tint + 1인 최초의 인덱스
+                    //j는 circle.tint인 최초의 인덱스
                     
                     currCircles.splice(i,0,circle)
-                    circleContainer.addChildAt(circle.obj, i)
-                    console.log(currCircles.length)
+                    circleContainer.addChildAt(circle.obj[1], i * 2)
+                    circleContainer.addChildAt(circle.obj[0], j * 2)
+                    // console.log(currCircles.length)                    
+                    console.log(circleContainer.children.length)
+                    
                 }
             }
         }
@@ -392,8 +471,8 @@ class App {
             
             for (let circle of currCircles) {
                 circle.addRad(delta * this.growingSpeed);
-                circle.obj.scale.x = circle.radius/50
-                circle.obj.scale.y = circle.radius/50
+                circle.obj[0].scale.x = circle.radius/50;circle.obj[1].scale.x = (circle.radius - 3)/50
+                circle.obj[0].scale.y = circle.radius/50;circle.obj[1].scale.y = (circle.radius - 3)/50;
 
             }
         }
