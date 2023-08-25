@@ -121,7 +121,7 @@ class App {
                 }
                 if(circle.y < 0){
                     circle.vy *= -1;
-                }else if(circle.y > innerWidth){
+                }else if(circle.y > innerHeight){
                     circle.vy *= -1;
                 }
 
