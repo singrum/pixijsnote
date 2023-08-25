@@ -64,11 +64,11 @@ class App {
         ]
         const circleNum = 10;
         for(let i = 0; i<circleNum; i++){
-            const circle = this.circle(innerWidth * Math.random(), innerHeight * Math.random(),100 * Math.random())
+            const circle = this.circle(innerWidth * Math.random(), innerHeight * Math.random(),150 * Math.random())
             circle.x = Math.random() * innerWidth;
             circle.y = Math.random() * innerHeight;
-            circle.vx = Math.random() * 3;
-            circle.vy = Math.random() * 3;
+            circle.vx = Math.random() * 2;
+            circle.vy = Math.random() * 2;
             canvas.addChild(circle)
         }
 
