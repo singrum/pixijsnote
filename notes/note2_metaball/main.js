@@ -62,7 +62,7 @@ class App {
             thresholdFilter(0.95),
             new PIXI.FXAAFilter()
         ]
-        const circleNum = 10;
+        const circleNum = 20;
         for(let i = 0; i<circleNum; i++){
             const circle = this.circle(innerWidth * Math.random(), innerHeight * Math.random(),150 * Math.random())
             circle.x = Math.random() * innerWidth;
