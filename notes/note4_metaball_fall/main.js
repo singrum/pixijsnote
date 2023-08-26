@@ -1,6 +1,9 @@
 import thresholdFilter from "./thresholdFilter.js";
-import grainyMetaballFilter from "./grainyMetaball.js"
 
+
+function randRange(min, max){
+    return min + (max - min) * Math.random()
+}
 class App {
 
     constructor() {
@@ -29,7 +32,7 @@ class App {
         // this.setBackground();
         this.setObj();
         this.setTicker();
-        this.setInteraction();
+        // this.setInteraction();
         
         
 
@@ -38,12 +41,10 @@ class App {
     circle(x,y,radius){
         const circle = new PIXI.Graphics()
         circle.lineStyle(0);
-        circle.beginFill(0xffffff);
+        circle.beginFill(0xffffff, 0.8);
         circle.drawCircle(0, 0, 50);
         circle.x = x;
         circle.y = y;
-        circle.scale.x = radius / 50
-        circle.scale.y = radius / 50
         return circle
     }
     setObj(){
@@ -62,47 +63,37 @@ class App {
             thresholdFilter(),
             new PIXI.FXAAFilter()
         ]
-        const circleNum = 20;
+        const circleNum = 8;
+        const unitRad = innerWidth / (circleNum - 1);
+        
+        this.circles = [];
         for(let i = 0; i<circleNum; i++){
-            const circle = this.circle(innerWidth * Math.random(), innerHeight * Math.random(),100 * Math.random())
-            circle.x = Math.random() * innerWidth;
-            circle.y = Math.random() * innerHeight;
-            circle.vx = Math.random() * 2;
-            circle.vy = Math.random() * 2;
+            const radius = randRange(unitRad, unitRad * 2)
+            const circle = this.circle(0,0,1)
+            circle.radius = radius
+            circle.x = unitRad * i;
+            circle.y = 0;
+            circle.vy = 1;
             canvas.addChild(circle)
+            this.circles.push(circle)
         }
+        
 
+        const fillArea = new PIXI.Graphics();
+        this.fillArea = fillArea
+        fillArea.lineStyle(0);
+        fillArea.beginFill(0xffffff,1);
+        fillArea.drawRect(0, 0, innerWidth, 1);
+        fillArea.name = "fill"
+        fillArea.x = 0;
+        fillArea.y = 0;
+        canvas.addChild(fillArea);
+        console.log(canvas)
 
         
-        
-    }
-    setInteraction() {
-        
-        window.addEventListener("click",e=>{
-            const ext = this.app.renderer.extract
-            console.log(ext.pixels(undefined, {
-                x : Math.floor(e.clientX), 
-                y : window.innerHeight - 1 - Math.floor(e.clientY), 
-                width : 1, 
-                height : 1}))
-        })
-
-
         
     }
 
-    setBackground(){
-        const background = new PIXI.Graphics()
-        
-        background.lineStyle(0);
-        background.beginFill(0x020202);
-
-        background.drawRect(0, 0, window.innerWidth, window.innerHeight);
-        background.tint = 1
-        this.app.stage.addChild(background);
-        this.background = background
-        
-    }
     setTicker() {
         
         // noise.seed(Math.random());
@@ -111,23 +102,17 @@ class App {
         const moveCircles = (delta)=>{
             time += delta;
             
-            for(let circle of this.canvas.children){
-                circle.x += circle.vx
+            for(let circle of this.circles){
+                circle.scale.x = (circle.radius + Math.sin(circle.radius + time/20 ) * 20) / 50
+                circle.scale.y = (circle.radius + Math.sin(circle.radius + time/20) * 20) / 50
                 circle.y += circle.vy
-                if(circle.x < 0){
-                    circle.vx *= -1;
-                }else if(circle.x > innerWidth){
-                    circle.vx *= -1;
-                }
-                if(circle.y < 0){
-                    circle.vy *= -1;
-                }else if(circle.y > innerHeight){
-                    circle.vy *= -1;
-                }
+                this.fillArea.scale.y = circle.y
+
 
             }
         }
         this.app.ticker.add(delta => {
+            this.app.renderer.render(this.app.stage)
             moveCircles(delta)
 
         })
