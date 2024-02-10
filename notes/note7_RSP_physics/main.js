@@ -149,7 +149,7 @@ class App {
             // document.querySelector("#debug").innerText = `alpha : ${this.round(alpha)}\nbeta : ${this.round(beta)}\ngamma : ${this.round(gamma)}`
             const k = 2
             const gravityX = Math.cos(beta) * Math.sin(gamma) * k
-            const gravityY = -Math.sin(beta) * k
+            const gravityY = Math.sin(beta) * k
             const gravityZ = -Math.cos(beta) * Math.cos(gamma) * k
             this.engine.gravity.x = gravityX
             this.engine.gravity.y = gravityY
