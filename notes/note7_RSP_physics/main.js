@@ -139,7 +139,7 @@ class App {
         // })
         
         window.addEventListener('deviceorientation', evt=>{
-            document.querySelector("#debug").innerText = evt.alpha
+            document.querySelector("#debug").innerText = `alpha : ${this.round(evt.alpha)}\nbeta : ${this.round(evt.beta)}\ngamma : ${this.round(evt.gamma)}`
             if( ! (evt.alpha && evt.beta && evt.gamma)){
                 return;
             }
