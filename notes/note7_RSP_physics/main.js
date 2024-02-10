@@ -152,7 +152,7 @@ class App {
             const gravityY = -Math.sin(beta) * k
             const gravityZ = -Math.cos(beta) * Math.cos(gamma) * k
             this.engine.gravity.x = gravityX
-            this.engine.gravity.x = gravityY
+            this.engine.gravity.y = gravityY
         
 
             
