@@ -139,14 +139,14 @@ class App {
         // })
         
         window.addEventListener('deviceorientation', evt=>{
-            document.querySelector("#debug").innerText = `alpha : ${this.round(evt.alpha)}\nbeta : ${this.round(evt.beta)}\ngamma : ${this.round(evt.gamma)}`
+            document.querySelector("#debug").innerText = `alpha : ${Math.round(evt.alpha)}\nbeta : ${Math.round(evt.beta)}\ngamma : ${Math.round(evt.gamma)}`
             if( ! (evt.alpha && evt.beta && evt.gamma)){
                 return;
             }
             const alpha = evt.alpha * Math.PI / 180;
             const beta = evt.beta * Math.PI / 180;
             const gamma = evt.gamma * Math.PI / 180;
-            document.querySelector("#debug").innerText = `alpha : ${this.round(alpha)}\nbeta : ${this.round(beta)}\ngamma : ${this.round(gamma)}`
+            // document.querySelector("#debug").innerText = `alpha : ${this.round(alpha)}\nbeta : ${this.round(beta)}\ngamma : ${this.round(gamma)}`
             const k = 2
             const gravityX = Math.cos(beta) * Math.sin(gamma) * k
             const gravityY = -Math.sin(beta) * k
