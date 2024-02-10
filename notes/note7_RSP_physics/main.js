@@ -104,6 +104,7 @@ class App {
         this.setOrientationControl()
         this.setEvent()
         
+        
     }
     setEvent() {
         
@@ -128,11 +129,17 @@ class App {
         Matter.Events.on(this.runner, 'afterTick', function () {
             onCollision()
         })
+        
     }
     setOrientationControl(){
+        // window.addEventListener('click', evt=>{
+            
+        //     this.engine.gravity.y = -this.engine.gravity.y
+        //     document.querySelector("#debug").innerText = 1
+        // })
         
         window.addEventListener('deviceorientation', evt=>{
-            
+            document.querySelector("#debug").innerText = 1
             if( ! (evt.alpha && evt.beta && evt.gamma)){
                 return;
             }
@@ -144,8 +151,8 @@ class App {
             const gravityX = Math.cos(beta) * Math.sin(gamma) * k
             const gravityY = -Math.sin(beta) * k
             const gravityZ = -Math.cos(beta) * Math.cos(gamma) * 9
-            this.engine.x = gravityX
-            this.engine.y = gravityY
+            this.engine.gravity.x = gravityX
+            this.engine.gravity.x = gravityY
         
 
             
