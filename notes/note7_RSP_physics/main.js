@@ -139,7 +139,7 @@ class App {
         // })
         
         window.addEventListener('deviceorientation', evt=>{
-            document.querySelector("#debug").innerText = 1
+            document.querySelector("#debug").innerText = "Device Orientation Event"
             if( ! (evt.alpha && evt.beta && evt.gamma)){
                 return;
             }
