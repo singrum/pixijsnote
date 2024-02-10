@@ -43,7 +43,7 @@ class App {
             engine: engine,
             options: {
                 width: innerWidth,
-                height: innerHeight,
+                height: innerHeight - 100,
                 wireframes: false,
                 showAngleIndicator: false,
                 background: 0xffffff
@@ -87,8 +87,8 @@ class App {
                 objs.push(obj)
             }
         }
-
-
+        
+        
         // add all of the bodies to the world
         Matter.Composite.add(engine.world, [...objs, ...walls]);
 
@@ -100,8 +100,10 @@ class App {
         this.runner = runner
         // run the engine
         Matter.Runner.run(runner, engine);
-        this.setEvent()
+        
         this.setOrientationControl()
+        this.setEvent()
+        
     }
     setEvent() {
         
@@ -130,14 +132,14 @@ class App {
     setOrientationControl(){
         
         window.addEventListener('deviceorientation', evt=>{
-        
+            
             if( ! (evt.alpha && evt.beta && evt.gamma)){
                 return;
             }
             const alpha = evt.alpha * Math.PI / 180;
             const beta = evt.beta * Math.PI / 180;
             const gamma = evt.gamma * Math.PI / 180;
-            
+            document.querySelector("#debug").innerText = `alpha : ${this.round(alpha)}\nbeta : ${this.round(beta)}\ngamma : ${this.round(gamma)}`
             const k = 9
             const gravityX = Math.cos(beta) * Math.sin(gamma) * k
             const gravityY = -Math.sin(beta) * k
