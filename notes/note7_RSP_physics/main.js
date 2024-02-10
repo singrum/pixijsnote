@@ -43,7 +43,7 @@ class App {
             engine: engine,
             options: {
                 width: innerWidth,
-                height: innerHeight - 100,
+                height: innerHeight,
                 wireframes: false,
                 showAngleIndicator: false,
                 background: 0xffffff
@@ -53,7 +53,7 @@ class App {
         // create two boxes and a ground
 
         let walls = [
-            Matter.Bodies.rectangle(innerWidth / 2, innerHeight + 100, innerWidth, 200, { isStatic: true }), // bottom
+            Matter.Bodies.rectangle(innerWidth / 2, innerHeight+100, innerWidth, 200, { isStatic: true }), // bottom
             Matter.Bodies.rectangle(innerWidth / 2, -100, innerWidth, 200, { isStatic: true }), // top
             Matter.Bodies.rectangle(-100, innerHeight / 2, 200, innerHeight, { isStatic: true }), // left
             Matter.Bodies.rectangle(innerWidth + 100, innerHeight / 2, 200, innerHeight, { isStatic: true })
@@ -132,14 +132,9 @@ class App {
         
     }
     setOrientationControl(){
-        // window.addEventListener('click', evt=>{
-            
-        //     this.engine.gravity.y = -this.engine.gravity.y
-        //     document.querySelector("#debug").innerText = 1
-        // })
         
         window.addEventListener('deviceorientation', evt=>{
-            document.querySelector("#debug").innerText = `alpha : ${Math.round(evt.alpha)}\nbeta : ${Math.round(evt.beta)}\ngamma : ${Math.round(evt.gamma)}`
+            // document.querySelector("#debug").innerText = `alpha : ${Math.round(evt.alpha)}\nbeta : ${Math.round(evt.beta)}\ngamma : ${Math.round(evt.gamma)}`
             if( ! (evt.alpha && evt.beta && evt.gamma)){
                 return;
             }
