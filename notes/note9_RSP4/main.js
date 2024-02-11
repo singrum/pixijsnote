@@ -108,7 +108,7 @@ class App {
             
             const delta = timeStamp.source.delta
             time += delta
-            if (time < 200) {
+            if (time < 150) {
                 return
             }
             cnt ++;
