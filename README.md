@@ -5,3 +5,4 @@ Equipotential Metaball : https://singrum.github.io/pixijsnote/notes/note5_equipo
 Rock Scissors Paper : https://singrum.github.io/pixijsnote/notes/note6_rock_scissors_paper  
 RSP with physics : https://singrum.github.io/pixijsnote/notes/note7_RSP_physics  
 RSP3 : https://singrum.github.io/pixijsnote/notes/note8_RSP_free_collision  
+RSP4 : https://singrum.github.io/pixijsnote/notes/note9_RSP4  
