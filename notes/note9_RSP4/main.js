@@ -57,7 +57,7 @@ class App {
 
         let walls = [
             Matter.Bodies.rectangle(innerWidth / 2, innerHeight + 100, innerWidth, 200, { isStatic: true }), // bottom
-            // Matter.Bodies.rectangle(innerWidth / 2, -100, innerWidth, 200, { isStatic: true }), // top
+            Matter.Bodies.rectangle(innerWidth / 2, -100, innerWidth, 200, { isStatic: true }), // top
             Matter.Bodies.rectangle(-100, innerHeight / 2, 200, innerHeight, { isStatic: true }), // left
             Matter.Bodies.rectangle(innerWidth + 100, innerHeight / 2, 200, innerHeight, { isStatic: true })
         ]
@@ -181,7 +181,7 @@ class App {
     setInteraction() {
         window.addEventListener("click", e => {
             
-            this.flag = !this.flag ? 1 : this.flag + 1
+            this.flag = !this.flag ? 3 : this.flag + 1
         })
     }
     run() {
