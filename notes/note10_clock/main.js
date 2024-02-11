@@ -37,7 +37,7 @@ class App {
         // create an engine
         let engine = Matter.Engine.create();
         engine.gravity.x = 0
-        engine.gravity.y = 1.1
+        engine.gravity.y = 0.8
         this.engine = engine
         // create a renderer
         let render = Matter.Render.create({
