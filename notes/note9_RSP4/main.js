@@ -114,34 +114,34 @@ class App {
             cnt ++;
             time = 0;
             if(this.flag === 1){
-                const obj = this.getObj(cnt % 3, {x : 10, y : 100})
+                const obj = this.getObj(cnt % 3, {x : 0, y : 100})
                 Matter.Body.setVelocity(obj, { x: 5, y: 0 });
                 
                 Matter.Composite.add(this.engine.world, obj);    
             }
             else if(this.flag === 2){
-                const obj1 = this.getObj(cnt % 3, {x : 10, y : 100})
+                const obj1 = this.getObj(cnt % 3, {x : 0, y : 100})
                 Matter.Body.setVelocity(obj1, { x: 5, y: 0 });
                 
                 Matter.Composite.add(this.engine.world, obj1);    
 
-                const obj2 = this.getObj((cnt+1) % 3, {x : 10, y : 150})
+                const obj2 = this.getObj((cnt+1) % 3, {x : 0, y : 150})
                 Matter.Body.setVelocity(obj2, { x: 5, y: 0 });
                 
                 Matter.Composite.add(this.engine.world, obj2);    
             }
             else if(this.flag === 3){
-                const obj1 = this.getObj(cnt % 3, {x : 10, y : 100})
+                const obj1 = this.getObj(cnt % 3, {x : 0, y : 100})
                 Matter.Body.setVelocity(obj1, { x: 5, y: 0 });
                 
                 Matter.Composite.add(this.engine.world, obj1);    
 
-                const obj2 = this.getObj((cnt+1) % 3, {x : 10, y : 150})
+                const obj2 = this.getObj((cnt+1) % 3, {x : 0, y : 150})
                 Matter.Body.setVelocity(obj2, { x: 5, y: 0 });
                 
                 Matter.Composite.add(this.engine.world, obj2);    
 
-                const obj3 = this.getObj((cnt+2) % 3, {x : 10, y : 200})
+                const obj3 = this.getObj((cnt+2) % 3, {x : 0, y : 200})
                 Matter.Body.setVelocity(obj3, { x: 5, y: 0 });
                 
                 Matter.Composite.add(this.engine.world, obj3);    
@@ -181,7 +181,7 @@ class App {
     setInteraction() {
         window.addEventListener("click", e => {
             
-            this.flag = !this.flag ? 3 : this.flag + 1
+            this.flag = !this.flag ? 1 : this.flag + 1
         })
     }
     run() {
