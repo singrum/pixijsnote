@@ -1,4 +1,6 @@
 
+
+
 const getRandom = (min, max) => {
     if (max === undefined) {
         return Math.random() * min
@@ -37,7 +39,7 @@ class App {
         // create an engine
         let engine = Matter.Engine.create();
         engine.gravity.x = 0
-        engine.gravity.y = 1.1
+        engine.gravity.y = 1
         this.engine = engine
         // create a renderer
         let render = Matter.Render.create({
@@ -66,10 +68,13 @@ class App {
         const objs = []
         this.objs = objs
 
+        const length = 200
+        const seeds = [this.getObj(0, {x : innerWidth / 2, y : innerHeight / 2 - length / Math.sqrt(3)}),
+        this.getObj(1, {x : innerWidth / 2 - length / 2, y : innerHeight / 2 + length / Math.sqrt(12)}),
+        this.getObj(2, {x : innerWidth / 2 + length / 2, y : innerHeight / 2 + length / Math.sqrt(12)})]
+        
+        this.objs = [...seeds]
 
-        for (let obj of this.objs) {
-            objMap[obj.name].push(obj)
-        }
 
 
 
@@ -98,61 +103,14 @@ class App {
                 }
             })
         obj.name = parseInt(type)
-        obj.restitution = 1.0
+        obj.restitution = 1.1
+        obj.frictionAir = 0
         return obj
     }
     setEvent() {
         let time = 0
         let cnt = 0
-        const makeObj = timeStamp => {
-            
-            const delta = timeStamp.source.delta
-            time += delta
-            if (time < 200) {
-                return
-            }
-            cnt ++;
-            time = 0;
-            if(this.flag === 1){
-                const obj = this.getObj(cnt % 3, {x : 5, y : 100})
-                Matter.Body.setVelocity(obj, { x: 5, y: 0 });
-                
-                Matter.Composite.add(this.engine.world, obj);    
-            }
-            else if(this.flag === 2){
-                const obj1 = this.getObj(cnt % 3, {x : 5, y : 100})
-                Matter.Body.setVelocity(obj1, { x: 5, y: 0 });
-                
-                Matter.Composite.add(this.engine.world, obj1);    
-
-                const obj2 = this.getObj((cnt+1) % 3, {x : 5, y : 150})
-                Matter.Body.setVelocity(obj2, { x: 5, y: 0 });
-                
-                Matter.Composite.add(this.engine.world, obj2);    
-            }
-            else if(this.flag === 3){
-                const obj1 = this.getObj(cnt % 3, {x : 5, y : 100})
-                Matter.Body.setVelocity(obj1, { x: 5, y: 0 });
-                
-                Matter.Composite.add(this.engine.world, obj1);    
-
-                const obj2 = this.getObj((cnt+1) % 3, {x : 5, y : 150})
-                Matter.Body.setVelocity(obj2, { x: 5, y: 0 });
-                
-                Matter.Composite.add(this.engine.world, obj2);    
-
-                const obj3 = this.getObj((cnt+2) % 3, {x : 5, y : 200})
-                Matter.Body.setVelocity(obj3, { x: 5, y: 0 });
-                
-                Matter.Composite.add(this.engine.world, obj3);    
-            }
-            else{
-                return
-            }
-            
-            
-
-        }
+        
         const onCollision = () => {
             this.engine.world.bodies.filter(e=>!this.walls.includes(e)).pairs(pair => {
                 const collide = Matter.Collision.collides(pair[0], pair[1])
@@ -173,15 +131,20 @@ class App {
         }
         Matter.Events.on(this.runner, 'afterTick', function (timeStamp) {
             onCollision()
-            makeObj(timeStamp)
         })
 
 
     }
     setInteraction() {
         window.addEventListener("click", e => {
+            // console.log(this.engine.world.bodies.filter(e=>!this.walls.includes(e)))
+            for(let obj of this.engine.world.bodies.filter(e=>!this.walls.includes(e))){
+                const copies = [this.getObj(obj.name, {x : obj.position.x, y : obj.position.y}),
+                    this.getObj(obj.name, {x : obj.position.x, y : obj.position.y})]
+
+                Matter.Composite.add(this.engine.world, copies)
+            }
             
-            this.flag = !this.flag ? 1 : this.flag + 1
         })
     }
     run() {
