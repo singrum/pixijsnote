@@ -461,7 +461,7 @@ class App {
                     circleContainer.addChildAt(circle.obj[1], i * 2)
                     circleContainer.addChildAt(circle.obj[0], j * 2)
                     // console.log(currCircles.length)                    
-                    console.log(circleContainer.children.length)
+                    // console.log(circleContainer.children.length)
                     
                 }
             }

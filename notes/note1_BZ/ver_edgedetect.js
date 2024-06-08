@@ -383,7 +383,7 @@ class App {
                     
                     currCircles.splice(i,0,circle)
                     circleContainer.addChildAt(circle.obj, i)
-                    console.log(currCircles.length)
+                    // console.log(currCircles.length)
                 }
             }
         }
